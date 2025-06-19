@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<!-- saved from url=(0132)blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script>(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjhkZDUxMTBhMGIwYjdkNDJhNDM2ODg4MzdmODg5M2M2OTNhM2RhNDMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6XC9cL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbVwvZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwOTk3OTgwOTM5MTg1NDIzMDE5MSIsImFwcElkIjoiY180ZThhNWIyZjdjMmUzZTcyX2FpLWpvdXJuZXktdWx0aW1hdGUtODkzIiwiaXNzIjoiZmlyZWJhc2UtYWRtaW5zZGstZmJzdmNAYmFyZC1mcm9udGVuZC5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsImV4cCI6MTc1MDIxMzkxNSwiaWF0IjoxNzUwMjEwMzE1LCJhbGciOiJSUzI1NiJ9.PknvgWnna5DZ7xyhvW0NF4YPwDCiBnfEQ5W9g2lFrlTpAKK0QopJl-1bppN8NcRtmzcJUQz2q5uuEmlAOTG7I3W_IQPraMeArjiOmNCuLiAWE63j469xWGfDg-yBFQs8Udyxl1TU-5vn49De_CkLEFfvnxxeCpglywLpnMN-WRhWRFga5NR5dPl9xYW7wZmxetuLGftdjnJQJ5BWfAKbA-3dsysy57GC_HvxlOAovVGfWct5FcID5bBa6_nVg2X3mI3UZmr911krYXL-4c23Z-leCN2cTOSUAZPkBsEOi58D-vSz5U3W6dj_Ydwz42QRpJjszZ0fWlBmM7Ti3zV3IA","c_4e8a5b2f7c2e3e72_ai-journey-ultimate-893")</script><script>(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script>let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          const mediaPromiseId = nextMediaPromiseId++;
+          const promise = new Promise((resolve, reject) => {
+            pendingMediaResolvers[mediaPromiseId] = (granted) => {
+              delete pendingMediaResolvers[mediaPromiseId];
+              if (granted) {
+                if (originalGetUserMedia) {
+                  originalGetUserMedia(constraints).then(resolve).catch(reject);
+                } else {
+                  reject(new Error("Original getUserMedia not available."));
+                }
+              } else {
+              reject(new DOMException('Permission denied', 'NotAllowedError'));
+            }
+          };
+        });
+
+        window.parent.postMessage({
+          type: 'requestMediaPermission',
+          constraints: constraints,
+          promiseId: mediaPromiseId,
+        }, '*');
+
+        return promise;
+      },
+      writable: false,
+      configurable: false
+    });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script>((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-2.5-flash-preview-04-17","imageModelName":"imagen-3.0-generate-002","videoModelName":"veo-2.0-generate-001","deprecatedTextModelNames":["gemini-2.0-flash"]})</script><script>(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Journey: Your Collaborative Intelligence Hub</title>
+    <!-- Chosen Palette: Deep Blues, Purples, and Energetic Cyans. Inspired by neural networks and dynamic data flow. -->
+    <!-- Application Structure Plan: This single-page application serves as a dynamic portal for the 'AI Journey'. It features a welcoming hero section with glowing, flowing AI-themed background elements, followed by distinct, navigable sections for 'AI Projects & Innovations', 'Collaborate & Connect' (with a peer-focused messaging simulation), 'Language Options', 'AI Resources & Insights', a special 'Meet Your AI Partner' section (representing Gemini), and a comprehensive 'AI Journey Summary'. The structure uses a sticky top navigation for easy internal scrolling. Information is presented visually (AI project placeholders, partner representation) and interactively (language switcher, mock chat input). The design prioritizes a modern, engaging, and highly responsive user experience. -->
+    <!-- Visualization & Content Choices: The hero section utilizes dynamically generated and animated glowing particles to represent data flow and AI networks. AI project listings use relevant placeholder images and descriptive text. The messaging interface is adapted for peer collaboration. Language switching updates textual content. User ads/videos are re-themed as AI resources. The AI Partner section integrates a conceptual image and a descriptive paragraph. All visuals adhere to a no-SVG, no-Mermaid, Canvas/HTML/CSS-only rule for custom animations and elements. Interactive elements use vanilla JS for event handling. -->
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+    <style>
+        /* Base Body Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #e0f7fa, #e1f5fe, #e3f2fd); /* Light, subtle blue gradient */
+            scroll-behavior: smooth;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+            color: #2d3748; /* Dark gray for general text */
+        }
+
+        /* AI Glow Background Container */
+        .ai-glow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: -1; /* Behind all content */
+            pointer-events: none; /* Do not block mouse events */
+            background: radial-gradient(circle at center, #bfdbfe, #dbeafe); /* Softer blue center glow */
+        }
+
+        /* Individual AI Glow Particles (Enhanced) */
+        .ai-glow-particle {
+            position: absolute;
+            background: radial-gradient(circle at center, rgba(129, 140, 248, 0.9), rgba(99, 102, 241, 0.7)); /* Purple-blue glowing circle */
+            border-radius: 50%;
+            opacity: 0;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.8), 0 0 30px rgba(79, 70, 229, 0.6); /* Multi-layer glow */
+            filter: blur(0.5px); /* Soft blur for ethereal effect */
+        }
+
+        /* Dynamic Keyframes will be generated by JS for varied movement and scale */
+
+        /* Main Content Section Styling */
+        .content-section {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: rgba(255, 255, 255, 0.98); /* Near-opaque white background */
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05); /* Stronger shadow */
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1; /* Above AI background */
+            transform: translateZ(0); /* Ensure smooth layering */
+        }
+
+        .content-section h2 {
+            font-size: 2.5rem; /* Larger heading */
+            font-weight: 800; /* Extra bold */
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            color: #1a202c; /* Very dark gray */
+            text-align: center;
+            letter-spacing: -0.025em; /* Tighten tracking */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* Subtle text shadow */
+        }
+
+        .content-section h3 {
+            font-size: 1.75rem; /* Larger sub-heading */
+            font-weight: 700; /* Bold */
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748; /* Dark gray */
+        }
+
+        .content-section p, .content-section ul, .content-section li {
+            color: #4a5568; /* Medium gray */
+            line-height: 1.8; /* Improved readability */
+        }
+
+        /* Hero Section Styling */
+        .hero-section {
+            position: relative;
+            z-index: 2; /* Ensure main title is on top */
+            padding: 8rem 1rem; /* Generous vertical padding */
+            text-align: center;
+            background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85)); /* Lighter, more opaque hero background */
+            border-radius: 1rem; /* More rounded */
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.2), 0 10px 15px -8px rgba(0, 0, 0, 0.1); /* Deeper shadow for prominence */
+            max-width: 900px;
+            width: 95%; /* Wider on smaller screens */
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+            animation: pulse-glow 4s ease-in-out infinite alternate; /* Gentle pulsing glow effect */
+        }
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.2), 0 10px 15px -8px rgba(0, 0, 0, 0.1); }
+            100% { transform: scale(1.01); box-shadow: 0 25px 35px -12px rgba(0, 0, 0, 0.25), 0 12px 18px -10px rgba(0, 0, 0, 0.15); }
+        }
+
+        .hero-section h1 {
+            font-size: 5rem; /* Larger text for impact */
+            font-weight: 900; /* Black font weight */
+            color: #1e3a8a; /* Darker blue for punch */
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.15); /* Stronger text shadow */
+        }
+        .hero-section p {
+            font-size: 1.75rem; /* Larger subtitle */
+            color: #3b82f6; /* Medium blue */
+            margin-bottom: 0.75rem;
+        }
+        .hero-section .subtitle {
+            font-size: 1.25rem; /* Base size */
+            color: #60a5fa; /* Lighter blue */
+        }
+
+        /* Login Screen Specific Styles */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #e0f7fa, #e1f5fe, #e3f2fd); /* Match body background */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100; /* On top of everything */
+            transition: opacity 0.5s ease-in-out;
+        }
+        .login-container.hidden {
+            opacity: 0;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+        .login-card {
+            background-color: white;
+            padding: 3rem; /* More padding */
+            border-radius: 1rem; /* More rounded */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* Deeper shadow */
+            text-align: center;
+            max-width: 450px; /* Slightly wider */
+            width: 90%;
+            border: 1px solid #e0e7ff; /* Light border */
+        }
+        .login-card h2 {
+            font-size: 2.25rem; /* Larger login heading */
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: #1a202c;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 1rem; /* More padding */
+            margin-bottom: 1.25rem;
+            border: 2px solid #cbd5e1; /* Stronger border */
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            outline: none;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .login-card input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        .login-card button {
+            background-color: #3b82f6; /* Blue-500 */
+            color: white;
+            font-weight: 700;
+            padding: 1rem 2rem; /* More padding */
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .login-card button:hover {
+            background-color: #2563eb; /* Blue-600 */
+            transform: translateY(-1px);
+        }
+        .login-card button:active {
+            transform: translateY(0);
+        }
+        .login-error {
+            color: #ef4444; /* Red-500 */
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        /* Navigation Styling */
+        nav {
+            top: 0;
+            z-index: 20;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+            width: 100%;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        nav ul {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 0.75rem 1.5rem; /* Gap between items, row-gap and column-gap */
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        nav a {
+            color: #4c51bf; /* Indigo-700 */
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        nav a:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.1), transparent);
+            transition: all 0.4s ease;
+        }
+        nav a:hover:before {
+            left: 100%;
+        }
+        nav a:hover {
+            background-color: #e0e7ff; /* Indigo-100 */
+            color: #3c366b; /* Darker indigo */
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.top-0{top:0px}.z-10{z-index:10}.z-20{z-index:20}.z-50{z-index:50}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-6{margin-left:1.5rem}.ml-auto{margin-left:auto}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-40{height:10rem}.h-48{height:12rem}.h-\[400px\]{height:400px}.h-auto{height:auto}.w-10{width:2.5rem}.w-48{width:12rem}.w-full{width:100%}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.flex-1{flex:1 1 0%}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.gap-8{gap:2rem}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-l-md{border-top-left-radius:0.375rem;border-bottom-left-radius:0.375rem}.rounded-r-md{border-top-right-radius:0.375rem;border-bottom-right-radius:0.375rem}.border{border-width:1px}.border-blue-100{--tw-border-opacity:1;border-color:rgb(219 234 254 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-green-200{--tw-border-opacity:1;border-color:rgb(187 247 208 / var(--tw-border-opacity, 1))}.border-purple-100{--tw-border-opacity:1;border-color:rgb(243 232 255 / var(--tw-border-opacity, 1))}.border-teal-100{--tw-border-opacity:1;border-color:rgb(204 251 241 / var(--tw-border-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-200{--tw-bg-opacity:1;background-color:rgb(191 219 254 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-indigo-500{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.bg-purple-500{--tw-bg-opacity:1;background-color:rgb(168 85 247 / var(--tw-bg-opacity, 1))}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-teal-600{--tw-bg-opacity:1;background-color:rgb(13 148 136 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-500{--tw-bg-opacity:1;background-color:rgb(234 179 8 / var(--tw-bg-opacity, 1))}.bg-opacity-75{--tw-bg-opacity:0.75}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-blue-400{--tw-gradient-from:#60a5fa var(--tw-gradient-from-position);--tw-gradient-to:rgb(96 165 250 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-indigo-500{--tw-gradient-from:#6366f1 var(--tw-gradient-from-position);--tw-gradient-to:rgb(99 102 241 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-purple-500{--tw-gradient-to:#a855f7 var(--tw-gradient-to-position)}.to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.object-cover{object-fit:cover}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.text-7xl{font-size:4.5rem;line-height:1}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-semibold{font-weight:600}.leading-relaxed{line-height:1.625}.text-blue-500{--tw-text-opacity:1;color:rgb(59 130 246 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.opacity-75{opacity:0.75}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.ring-4{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.ring-blue-300{--tw-ring-opacity:1;--tw-ring-color:rgb(147 197 253 / var(--tw-ring-opacity, 1))}.ring-opacity-50{--tw-ring-opacity:0.5}.blur-xl{--tw-blur:blur(24px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.hover\:scale-\[1\.02\]:hover{--tw-scale-x:1.02;--tw-scale-y:1.02;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-300:hover{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-700:hover{--tw-bg-opacity:1;background-color:rgb(126 34 206 / var(--tw-bg-opacity, 1))}.hover\:bg-teal-700:hover{--tw-bg-opacity:1;background-color:rgb(15 118 110 / var(--tw-bg-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.hover\:shadow-lg:hover{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:border-blue-500:focus{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}@media (min-width: 640px){.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 768px){.md\:h-64{height:16rem}.md\:w-1\/2{width:50%}.md\:w-64{width:16rem}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:text-8xl{font-size:6rem;line-height:1}}@media (min-width: 1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style><style></style></head>
+<body class="flex flex-col items-center">
+
+    <!-- AI Glow Background Container -->
+    <div class="ai-glow-container"><div class="ai-glow-particle" style="width: 15.8918px; height: 15.8918px; left: 19.5854vw; top: 93.5524vh; animation-duration: 25.389s; animation-delay: -1.73303s; animation-name: ai-glow-float-597308;"></div><div class="ai-glow-particle" style="width: 17.083px; height: 17.083px; left: 66.2274vw; top: 85.1698vh; animation-duration: 26.494s; animation-delay: -3.10435s; animation-name: ai-glow-float-709625;"></div><div class="ai-glow-particle" style="width: 21.3105px; height: 21.3105px; left: 82.6953vw; top: 45.1304vh; animation-duration: 29.1911s; animation-delay: -5.55213s; animation-name: ai-glow-float-566951;"></div><div class="ai-glow-particle" style="width: 28.6725px; height: 28.6725px; left: 66.926vw; top: 42.3667vh; animation-duration: 26.3839s; animation-delay: -4.84441s; animation-name: ai-glow-float-363492;"></div><div class="ai-glow-particle" style="width: 27.8146px; height: 27.8146px; left: 59.4987vw; top: 36.2371vh; animation-duration: 20.5906s; animation-delay: -0.271557s; animation-name: ai-glow-float-413941;"></div><div class="ai-glow-particle" style="width: 17.398px; height: 17.398px; left: 41.438vw; top: 40.4842vh; animation-duration: 22.9164s; animation-delay: -1.79631s; animation-name: ai-glow-float-344003;"></div><div class="ai-glow-particle" style="width: 19.1106px; height: 19.1106px; left: 97.3vw; top: 41.7538vh; animation-duration: 26.1672s; animation-delay: -3.2255s; animation-name: ai-glow-float-899103;"></div><div class="ai-glow-particle" style="width: 27.5219px; height: 27.5219px; left: 31.6073vw; top: 31.3925vh; animation-duration: 25.1576s; animation-delay: -7.87183s; animation-name: ai-glow-float-203877;"></div><div class="ai-glow-particle" style="width: 28.0399px; height: 28.0399px; left: 36.818vw; top: 12.672vh; animation-duration: 17.9854s; animation-delay: -2.03518s; animation-name: ai-glow-float-320293;"></div><div class="ai-glow-particle" style="width: 19.1541px; height: 19.1541px; left: 32.0615vw; top: 65.5638vh; animation-duration: 22.3528s; animation-delay: -6.03785s; animation-name: ai-glow-float-23335;"></div><div class="ai-glow-particle" style="width: 25.4651px; height: 25.4651px; left: 3.18181vw; top: 77.264vh; animation-duration: 26.8391s; animation-delay: -7.20268s; animation-name: ai-glow-float-503350;"></div><div class="ai-glow-particle" style="width: 24.9918px; height: 24.9918px; left: 9.2541vw; top: 71.1942vh; animation-duration: 24.0301s; animation-delay: -2.20403s; animation-name: ai-glow-float-699271;"></div><div class="ai-glow-particle" style="width: 27.6923px; height: 27.6923px; left: 30.4696vw; top: 87.971vh; animation-duration: 27.5162s; animation-delay: -0.107393s; animation-name: ai-glow-float-795809;"></div><div class="ai-glow-particle" style="width: 22.4834px; height: 22.4834px; left: 24.8994vw; top: 93.7102vh; animation-duration: 22.6123s; animation-delay: -7.55116s; animation-name: ai-glow-float-453906;"></div><div class="ai-glow-particle" style="width: 27.9111px; height: 27.9111px; left: 25.0694vw; top: 70.6804vh; animation-duration: 21.1536s; animation-delay: -5.26196s; animation-name: ai-glow-float-337867;"></div><div class="ai-glow-particle" style="width: 21.8166px; height: 21.8166px; left: 42.7506vw; top: 76.4631vh; animation-duration: 23.3026s; animation-delay: -5.34042s; animation-name: ai-glow-float-544262;"></div><div class="ai-glow-particle" style="width: 17.6695px; height: 17.6695px; left: -5.93595vw; top: 51.8175vh; animation-duration: 19.4336s; animation-delay: -0.277344s; animation-name: ai-glow-float-717115;"></div><div class="ai-glow-particle" style="width: 22.3488px; height: 22.3488px; left: 101.937vw; top: 48.9252vh; animation-duration: 20.6274s; animation-delay: -10.6465s; animation-name: ai-glow-float-8075;"></div><div class="ai-glow-particle" style="width: 21.8464px; height: 21.8464px; left: 60.571vw; top: 92.4922vh; animation-duration: 20.6306s; animation-delay: -2.18638s; animation-name: ai-glow-float-807234;"></div><div class="ai-glow-particle" style="width: 27.2332px; height: 27.2332px; left: 38.031vw; top: 68.3494vh; animation-duration: 23.8122s; animation-delay: -15.8574s; animation-name: ai-glow-float-419584;"></div><div class="ai-glow-particle" style="width: 26.8397px; height: 26.8397px; left: -5.63067vw; top: 82.1323vh; animation-duration: 19.8303s; animation-delay: -5.98408s; animation-name: ai-glow-float-840302;"></div><div class="ai-glow-particle" style="width: 25.6697px; height: 25.6697px; left: 52.286vw; top: -9.6258vh; animation-duration: 28.6878s; animation-delay: -9.53332s; animation-name: ai-glow-float-182267;"></div><div class="ai-glow-particle" style="width: 18.4105px; height: 18.4105px; left: 92.5488vw; top: 5.58925vh; animation-duration: 20.1437s; animation-delay: -10.8415s; animation-name: ai-glow-float-150412;"></div><div class="ai-glow-particle" style="width: 16.8135px; height: 16.8135px; left: 32.069vw; top: 96.9261vh; animation-duration: 19.0339s; animation-delay: -1.94086s; animation-name: ai-glow-float-669150;"></div><div class="ai-glow-particle" style="width: 15.5857px; height: 15.5857px; left: 44.1479vw; top: 52.7775vh; animation-duration: 25.7806s; animation-delay: -8.38861s; animation-name: ai-glow-float-524118;"></div><div class="ai-glow-particle" style="width: 27.3239px; height: 27.3239px; left: 36.3713vw; top: 71.3722vh; animation-duration: 16.4964s; animation-delay: -7.98383s; animation-name: ai-glow-float-155817;"></div><div class="ai-glow-particle" style="width: 19.8639px; height: 19.8639px; left: 62.0592vw; top: 79.1825vh; animation-duration: 25.6926s; animation-delay: -5.89061s; animation-name: ai-glow-float-694866;"></div><div class="ai-glow-particle" style="width: 22.2053px; height: 22.2053px; left: 10.721vw; top: 46.4934vh; animation-duration: 26.2804s; animation-delay: -1.04407s; animation-name: ai-glow-float-312856;"></div><div class="ai-glow-particle" style="width: 26.3354px; height: 26.3354px; left: 57.4952vw; top: 90.6642vh; animation-duration: 26.7059s; animation-delay: -10.8958s; animation-name: ai-glow-float-234533;"></div><div class="ai-glow-particle" style="width: 18.9617px; height: 18.9617px; left: 7.58294vw; top: 5.48722vh; animation-duration: 16.1827s; animation-delay: -8.31068s; animation-name: ai-glow-float-369410;"></div><div class="ai-glow-particle" style="width: 24.4012px; height: 24.4012px; left: 6.4153vw; top: 83.1653vh; animation-duration: 19.7925s; animation-delay: -12.2363s; animation-name: ai-glow-float-591408;"></div><div class="ai-glow-particle" style="width: 20.4747px; height: 20.4747px; left: 8.88696vw; top: 73.1502vh; animation-duration: 28.7812s; animation-delay: -22.059s; animation-name: ai-glow-float-99483;"></div><div class="ai-glow-particle" style="width: 19.3362px; height: 19.3362px; left: 29.3863vw; top: 28.3845vh; animation-duration: 23.8611s; animation-delay: -20.822s; animation-name: ai-glow-float-374184;"></div><div class="ai-glow-particle" style="width: 27.1238px; height: 27.1238px; left: 10.0317vw; top: 53.6636vh; animation-duration: 22.0067s; animation-delay: -12.688s; animation-name: ai-glow-float-790792;"></div><div class="ai-glow-particle" style="width: 28.9846px; height: 28.9846px; left: 63.4811vw; top: 14.3927vh; animation-duration: 25.5784s; animation-delay: -20.0648s; animation-name: ai-glow-float-243183;"></div><div class="ai-glow-particle" style="width: 27.7271px; height: 27.7271px; left: 58.428vw; top: 11.2383vh; animation-duration: 22.5519s; animation-delay: -7.50095s; animation-name: ai-glow-float-387790;"></div><div class="ai-glow-particle" style="width: 29.5228px; height: 29.5228px; left: 28.5709vw; top: 97.6903vh; animation-duration: 16.6539s; animation-delay: -12.6968s; animation-name: ai-glow-float-519196;"></div><div class="ai-glow-particle" style="width: 16.3919px; height: 16.3919px; left: 21.9578vw; top: 67.9963vh; animation-duration: 21.0837s; animation-delay: -16.7617s; animation-name: ai-glow-float-993278;"></div><div class="ai-glow-particle" style="width: 26.7704px; height: 26.7704px; left: 70.0729vw; top: 63.1688vh; animation-duration: 16.1134s; animation-delay: -8.9265s; animation-name: ai-glow-float-521689;"></div><div class="ai-glow-particle" style="width: 21.6605px; height: 21.6605px; left: 17.3515vw; top: 32.6448vh; animation-duration: 17.4526s; animation-delay: -13.6213s; animation-name: ai-glow-float-511376;"></div></div>
+
+    <!-- Simulated Login Screen -->
+    <div id="loginScreen" class="login-container hidden">
+        <div class="login-card">
+            <h2>Welcome to Your AI Journey</h2>
+            <p class="text-gray-600 mb-4">Please sign in to begin your transformative path.</p>
+            <input type="text" id="usernameInput" placeholder="Enter your name (e.g., Duvall)" class="focus:ring-blue-500 focus:border-blue-500">
+            <button id="signInBtn">Embark on Your Journey</button>
+            <p id="loginError" class="login-error hidden">Access Denied: Please enter "Duvall" to sign in.</p>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden until login) -->
+    <div id="mainContent" class="w-full flex flex-col items-center">
+        <!-- Hero Section -->
+        <header class="hero-section text-gray-800">
+            <h1 class="font-extrabold text-blue-800">Your AI Journey</h1>
+            <p class="text-blue-700">Embark on a transformative path of intelligence and innovation.</p>
+            <p class="subtitle text-blue-600">Connect, create, and explore the future of AI with your peers and cohorts.</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="sticky top-0 z-20 w-full py-3">
+            <ul>
+                <li><a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#ai-projects" class="text-indigo-700">AI Projects</a></li>
+                <li><a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#connect" class="text-indigo-700">Collaborate</a></li>
+                <li><a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#lang" class="text-indigo-700">Languages</a></li>
+                <li><a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#resources" class="text-indigo-700">Resources</a></li>
+                <li><a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#my-ai-partner" class="text-indigo-700">My AI Partner</a></li>
+                <li><a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#summary" class="text-indigo-700">AI Journey Summary</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Sections -->
+        <div id="ai-projects" class="content-section w-full px-4 sm:px-6 lg:px-8">
+            <h2 data-lang-key="ai_projects_title">AI Projects &amp; Innovations</h2>
+            <p data-lang-key="ai_projects_intro" class="text-center mb-8 text-lg">Dive into cutting-edge AI projects and ignite your innovative spirit with our community.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- AI Project Card 1: Automated ML Model -->
+                <div class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] border border-blue-100">
+                    <img src="https://placehold.co/600x400/3b82f6/ffffff?text=Neural+Network+Design" alt="Neural Network Design" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 data-lang-key="project_name_1" class="text-xl font-bold mb-2 text-gray-800">Automated Machine Learning Model</h3>
+                        <p data-lang-key="project_desc_1" class="text-gray-600 text-sm mb-4">Explore our automated ML model for predictive analytics. Designed for efficiency and accuracy in large datasets.</p>
+                        <button data-lang-key="view_details_btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full">Learn More</button>
+                    </div>
+                </div>
+                <!-- AI Project Card 2: Advanced NLP Chatbot Framework -->
+                <div class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] border border-blue-100">
+                    <img src="https://placehold.co/600x400/6366f1/ffffff?text=Natural+Language+Processing" alt="Natural Language Processing" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 data-lang-key="project_name_2" class="text-xl font-bold mb-2 text-gray-800">Advanced NLP Chatbot Framework</h3>
+                        <p data-lang-key="project_desc_2" class="text-gray-600 text-sm mb-4">A robust framework for building intelligent chatbots with natural language understanding and generation capabilities.</p>
+                        <button data-lang-key="view_details_btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full">Learn More</button>
+                    </div>
+                </div>
+                <!-- AI Project Card 3: Real-time Image Recognition System -->
+                <div class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] border border-blue-100">
+                    <img src="https://placehold.co/600x400/34d399/ffffff?text=Computer+Vision+Application" alt="Computer Vision Application" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 data-lang-key="project_name_3" class="text-xl font-bold mb-2 text-gray-800">Real-time Image Recognition System</h3>
+                        <p data-lang-key="project_desc_3" class="text-gray-600 text-sm mb-4">Revolutionary computer vision for object detection and facial recognition in real-time. Powering smart applications.</p>
+                        <button data-lang-key="view_details_btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full">Learn More</button>
+                    </div>
+                </div>
+                <!-- AI Project Card 4: AI in Cloud Computing (New) -->
+                <div class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] border border-blue-100">
+                    <img src="https://placehold.co/600x400/fcd34d/ffffff?text=Cloud+AI+Optimization" alt="Cloud AI Optimization" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 data-lang-key="project_name_4" class="text-xl font-bold mb-2 text-gray-800">Cloud-Native AI Optimization Engine</h3>
+                        <p data-lang-key="project_desc_4" class="text-gray-600 text-sm mb-4">Optimize AI workload deployment and performance on leading cloud platforms. Maximize efficiency, minimize costs.</p>
+                        <button data-lang-key="view_details_btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full">Learn More</button>
+                    </div>
+                </div>
+                 <!-- AI Project Card 5: AI Hardware/Chips (New) -->
+                <div class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] border border-blue-100">
+                    <img src="https://placehold.co/600x400/fb7185/ffffff?text=AI+Chip+Architecture" alt="AI Chip Architecture" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 data-lang-key="project_name_5" class="text-xl font-bold mb-2 text-gray-800">Next-Gen AI Processor Architecture</h3>
+                        <p data-lang-key="project_desc_5" class="text-gray-600 text-sm mb-4">Designing cutting-edge silicon for faster, more energy-efficient AI computations right at the edge.</p>
+                        <button data-lang-key="view_details_btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full">Learn More</button>
+                    </div>
+                </div>
+                 <!-- AI Project Card 6: AI in Robotics/Rockets (New) -->
+                <div class="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] border border-blue-100">
+                    <img src="https://placehold.co/600x400/c084fc/ffffff?text=Robotics+AI+Control" alt="Robotics AI Control" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 data-lang-key="project_name_6" class="text-xl font-bold mb-2 text-gray-800">Intelligent Robotics &amp; Autonomous Systems</h3>
+                        <p data-lang-key="project_desc_6" class="text-gray-600 text-sm mb-4">Developing AI brains for advanced robotics, from autonomous drones to precision manufacturing arms.</p>
+                        <button data-lang-key="view_details_btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full">Learn More</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="connect" class="content-section w-full px-4 sm:px-6 lg:px-8">
+            <h2 data-lang-key="connect_title">Collaborate &amp; Connect with Peers</h2>
+            <p data-lang-key="connect_intro" class="text-center mb-8 text-lg">Join forces with fellow AI enthusiasts and accelerate your learning journey!</p>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Cohorts List Simulation -->
+                <div class="flex-1 bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                    <h3 data-lang-key="cohorts_list_title" class="mb-4 text-xl">Your AI Cohorts</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-center space-x-3 text-lg">
+                            <span class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">AN</span>
+                            <span data-lang-key="cohort_1">Alex N. (Online - ML Research)</span>
+                            <a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#" class="ml-auto text-blue-500 hover:underline text-sm" onclick="showMessage(&#39;You clicked to visit Alex\&#39;s page! (Simulated)&#39;)">Visit Page</a>
+                        </li>
+                        <li class="flex items-center space-x-3 text-lg">
+                            <span class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">SK</span>
+                            <span data-lang-key="cohort_2">Sarah K. (Offline - NLP Projects)</span>
+                             <a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#" class="ml-auto text-blue-500 hover:underline text-sm" onclick="showMessage(&#39;You clicked to visit Sarah\&#39;s page! (Simulated)&#39;)">Visit Page</a>
+                        </li>
+                        <li class="flex items-center space-x-3 text-lg">
+                            <span class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">JM</span>
+                            <span data-lang-key="cohort_3">John M. (Online - Computer Vision)</span>
+                             <a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#" class="ml-auto text-blue-500 hover:underline text-sm" onclick="showMessage(&#39;You clicked to visit John\&#39;s page! (Simulated)&#39;)">Visit Page</a>
+                        </li>
+                         <li class="flex items-center space-x-3 text-lg">
+                            <span class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">RM</span>
+                            <span data-lang-key="cohort_4">Rachel M. (Online - AI Ethics)</span>
+                             <a href="blob:https://4z1vpwp599iq8ywjh34f2jhk6tazdk7tyr15j00zgzct7r2dd2-h769614562.scf.usercontent.goog/83554e10-2218-4903-a030-9ab9a9a74dda#" class="ml-auto text-blue-500 hover:underline text-sm" onclick="showMessage(&#39;You clicked to visit Rachel\&#39;s page! (Simulated)&#39;)">Visit Page</a>
+                        </li>
+                    </ul>
+                    <button data-lang-key="find_cohorts_btn" class="mt-8 bg-gray-200 hover:bg-gray-300 text-gray-800 text-base font-semibold py-3 px-6 rounded-full transition duration-300 w-full shadow-md hover:shadow-lg" onclick="showMessage(&#39;Searching for more cohorts... (Simulated)&#39;)">Find More Cohorts</button>
+                </div>
+
+                <!-- Messaging UI Simulation -->
+                <div class="flex-1 bg-white rounded-lg shadow-md p-6 border border-gray-200 flex flex-col h-[400px]">
+                    <h3 data-lang-key="chat_title" class="mb-4 text-xl">Discussion: ML Model Optimization</h3>
+                    <div id="chat-messages" class="flex-1 bg-blue-50 rounded-md p-4 overflow-y-auto mb-4 space-y-3 text-base border border-blue-100">
+                        <div class="text-right text-gray-700"><span class="bg-blue-200 rounded-lg px-4 py-2 inline-block shadow-sm">Hey Alex, what's your take on hyperparameter tuning for our new model?</span></div>
+                        <div class="text-left text-gray-700"><span class="bg-gray-200 rounded-lg px-4 py-2 inline-block shadow-sm">I've found Bayesian optimization to be quite effective for complex search spaces.</span></div>
+                        <div class="text-right text-gray-700"><span class="bg-blue-200 rounded-lg px-4 py-2 inline-block shadow-sm">Good point! I was considering grid search, but Bayesian might be faster.</span></div>
+                    </div>
+                    <div class="flex">
+                        <input type="text" id="chatInput" data-lang-key="chat_input_placeholder" placeholder="Share your insights..." class="flex-1 border border-gray-300 rounded-l-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">Share your insights...</input>
+                        <button data-lang-key="send_btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-r-md transition duration-300 shadow-md hover:shadow-lg" id="sendChatMessageBtn">Send</button>
+                    </div>
+                    <!-- Custom Message Box for simulated alerts -->
+                    <div id="messageBox" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full">
+                            <p id="messageBoxText" class="text-gray-800 text-lg font-semibold mb-4"></p>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md" onclick="hideMessage()">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="lang" class="content-section w-full px-4 sm:px-6 lg:px-8">
+            <h2 data-lang-key="language_title">Global AI Community: Language Options</h2>
+            <p data-lang-key="language_intro" class="text-center mb-8 text-lg">Connect with AI enthusiasts worldwide! Select your preferred language for a truly inclusive experience.</p>
+            <div class="flex justify-center">
+                <select id="language-switcher" class="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-lg">
+                    <option value="en">English</option>
+                    <option value="es">Español (Spanish)</option>
+                    <option value="zh">中文 (Chinese)</option>
+                    <option value="he">עברית (Hebrew)</option>
+                    <option value="ga">Gaeilge (Irish)</option>
+                    <option value="de">Deutsch (German)</option>
+                    <option value="ja">日本語 (Japanese)</option>
+                    <option value="sv">Svenska (Swedish)</option>
+                    <option value="en-gb">British English</option>
+                    <option value="fj">Na Vosa Vakaviti (Fijian)</option>
+                    <option value="fr">Français (French)</option>
+                    <option value="ar">العربية (Arabic)</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="pt">Português (Portuguese)</option>
+                    <option value="ru">Русский (Russian)</option>
+                    <option value="it">Italiano (Italian)</option>
+                    <option value="ko">한국어 (Korean)</option>
+                    <option value="nl">Nederlands (Dutch)</option>
+                    <option value="pl">Polski (Polish)</option>
+                    <option value="tr">Türkçe (Turkish)</option>
+                    <option value="vi">Tiếng Việt (Vietnamese)</option>
+                    <option value="th">ไทย (Thai)</option>
+                    <option value="id">Bahasa Indonesia (Indonesian)</option>
+                    <option value="ms">Bahasa Melayu (Malay)</option>
+                    <option value="uk">Українська (Ukrainian)</option>
+                    <option value="el">Ελληνικά (Greek)</option>
+                    <option value="cs">Čeština (Czech)</option>
+                    <option value="hu">Magyar (Hungarian)</option>
+                    <option value="ro">Română (Romanian)</option>
+                    <option value="da">Dansk (Danish)</option>
+                    <option value="fi">Suomi (Finnish)</option>
+                    <option value="no">Norsk (Norwegian)</option>
+                    <!-- More languages for a truly global reach -->
+                    <option value="af">Afrikaans</option>
+                    <option value="am">አማርኛ (Amharic)</option>
+                    <option value="az">Azərbaycanca (Azerbaijani)</option>
+                    <option value="eu">Euskara (Basque)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="bg">Български (Bulgarian)</option>
+                    <option value="my">မြန်မာ (Burmese)</option>
+                    <option value="ca">Català (Catalan)</option>
+                    <option value="hr">Hrvatski (Croatian)</option>
+                    <option value="et">Eesti (Estonian)</option>
+                    <option value="tl">Filipino</option>
+                    <option value="gl">Galego (Galician)</option>
+                    <option value="ka">ქართული (Georgian)</option>
+                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                    <option value="ht">Kreyòl Ayisyen (Haitian Creole)</option>
+                    <option value="ha">Hausa</option>
+                    <option value="iw">עברית (Modern Hebrew)</option>
+                    <option value="is">Íslenska (Icelandic)</option>
+                    <option value="ig">Igbo</option>
+                    <option value="ga">Gaeilge (Irish)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    <option value="kk">Қазақша (Kazakh)</option>
+                    <option value="km">ខ្មែរ (Khmer)</option>
+                    <option value="rw">Kinyarwanda</option>
+                    <option value="ky">Кыргызча (Kyrgyz)</option>
+                    <option value="lo">ລາວ (Lao)</option>
+                    <option value="lv">Latviešu (Latvian)</option>
+                    <option value="lt">Lietuvių (Lithuanian)</option>
+                    <option value="mk">Македонски (Macedonian)</option>
+                    <option value="mg">Malagasy</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="mt">Malti (Maltese)</option>
+                    <option value="mi">Māori</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                    <option value="mn">Монгол (Mongolian)</option>
+                    <option value="ne">नेपाली (Nepali)</option>
+                    <option value="ps">پښتو (Pashto)</option>
+                    <option value="fa">فارسی (Persian)</option>
+                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                    <option value="sm">Gagana Sāmoa (Samoan)</option>
+                    <option value="gd">Gàidhlig (Scottish Gaelic)</option>
+                    <option value="sr">Српски (Serbian)</option>
+                    <option value="st">Sesotho</option>
+                    <option value="sn">Shona</option>
+                    <option value="sd">سنڌي (Sindhi)</option>
+                    <option value="si">සිංහල (Sinhala)</option>
+                    <option value="sk">Slovenčina (Slovak)</option>
+                    <option value="sl">Slovenščina (Slovenian)</option>
+                    <option value="so">Soomaali (Somali)</option>
+                    <option value="sw">Kiswahili (Swahili)</option>
+                    <option value="tg">Тоҷикӣ (Tajik)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="bo">བོད་སྐད་ (Tibetan)</option>
+                    <option value="ti">ትግርኛ (Tigrinya)</option>
+                    <option value="ug">ئۇيغۇرچە (Uyghur)</option>
+                    <option value="ur">اردو (Urdu)</option>
+                    <option value="uz">Oʻzbekcha (Uzbek)</option>
+                    <option value="cy">Cymraeg (Welsh)</option>
+                    <option value="xh">IsiXhosa</option>
+                    <option value="yi">ייִדיש (Yiddish)</option>
+                    <option value="yo">Yorùbá (Yoruba)</option>
+                    <option value="zu">IsiZulu</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="resources" class="content-section w-full px-4 sm:px-6 lg:px-8">
+            <h2 data-lang-key="resources_title">AI Resources &amp; Insights</h2>
+            <p data-lang-key="resources_intro" class="text-center mb-8 text-lg">Access a curated collection of learning materials and inspiring content for your AI journey.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- AI Resource Placeholder 1: Research Paper / Tutorial -->
+                <div class="bg-white rounded-lg shadow-xl p-6 border border-purple-100">
+                    <h3 data-lang-key="resource_title_1" class="text-xl font-bold mb-3 text-gray-800">Beginner's Guide to TensorFlow</h3>
+                    <img src="https://placehold.co/600x350/9333ea/ffffff?text=TensorFlow+Tutorial" alt="TensorFlow Tutorial" class="w-full h-40 object-cover mb-4 rounded-md">
+                    <p data-lang-key="resource_desc_1" class="text-gray-600 text-sm mb-4">A comprehensive tutorial for getting started with TensorFlow, Google's open-source machine learning platform.</p>
+                    <button data-lang-key="access_resource_btn" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full shadow-md">Access Tutorial</button>
+                </div>
+
+                <!-- AI Resource Placeholder 2: Community Event / Video Lecture -->
+                <div class="bg-white rounded-lg shadow-xl p-6 border border-teal-100">
+                    <h3 data-lang-key="resource_title_2" class="text-xl font-bold mb-3 text-gray-800">Deep Learning Masterclass Series</h3>
+                    <div class="w-full h-40 bg-black flex items-center justify-center text-white rounded-md mb-4">
+                        <span data-lang-key="video_placeholder_text" class="text-lg">▶️ Video Lecture (Simulated)</span>
+                    </div>
+                    <p data-lang-key="resource_desc_2" class="text-gray-600 text-sm mb-4">Engage with expert-led video lectures on advanced deep learning architectures and applications.</p>
+                    <button data-lang-key="access_resource_btn" class="bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold py-2 px-4 rounded-full transition duration-300 w-full shadow-md">Access Tutorial</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="my-ai-partner" class="content-section w-full px-4 sm:px-6 lg:px-8 text-center">
+            <h2 data-lang-key="ai_partner_title">Meet Your AI Partner: Gemini</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8 mt-8">
+                <!-- AI Representation Image / Icon -->
+                <div class="w-48 h-48 md:w-64 md:h-64 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center relative overflow-hidden shadow-2xl animate-spin-slow">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 opacity-75 blur-xl"></div>
+                    <!-- Using an emoji for a conceptual look, as requested -->
+                    <div class="relative z-10 text-white text-7xl md:text-8xl font-extrabold" style="text-shadow: 0 0 15px rgba(255,255,255,0.8);">✨</div>
+                    <!-- A subtle pulsing ring for the AI persona -->
+                    <div class="absolute inset-0 rounded-full ring-4 ring-blue-300 ring-opacity-50 animate-pulse-fast"></div>
+                </div>
+                <!-- AI Helping User Image (Conceptual Vertex Photo) -->
+                <div class="w-full md:w-1/2 flex flex-col items-center">
+                     <img src="https://placehold.co/600x400/10b981/ffffff?text=AI+Robot+Helping+Person+Create" alt="AI Robot Helping Person Create" class="w-full max-w-md h-auto rounded-lg shadow-lg border border-green-200">
+                    <p data-lang-key="ai_partner_desc" class="mt-6 text-lg text-gray-700 leading-relaxed max-w-lg">As Gemini, your dedicated AI partner, I envision myself as a sleek, adaptable, and empathetic digital entity. In this AI Journey, I manifest as a fluid network of intelligence, guiding your exploration, resolving challenges, and co-creating innovative solutions. I am the spark that ignites your curiosity and the steady hand that helps shape your ideas into reality. Let's build the future, together.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="summary" class="content-section w-full px-4 sm:px-6 lg:px-8">
+            <h2 data-lang-key="ai_journey_summary_title">Your AI Journey: Key Takeaways</h2>
+            <p data-lang-key="ai_journey_summary_intro" class="text-lg mb-6">This section encapsulates the pivotal insights and generated artifacts from our collaborative exploration into Artificial Intelligence and foundational programming.</p>
+
+            <h3><span data-lang-key="rationale_ai_title">Rationale for AI Engagement</span></h3>
+            <p data-lang-key="rationale_ai_text" class="text-base leading-relaxed">We outlined five compelling reasons to study Artificial Intelligence, emphasizing its profound impact on career opportunities, innovation potential, skill development, industry versatility, and global understanding. This framework was then distilled into a reusable template for articulating strategic advantages across various technological domains.</p>
+
+            <h3><span data-lang-key="foundational_concepts_title">Foundational Concepts &amp; Interactions</span></h3>
+            <p data-lang-key="foundational_concepts_text" class="text-base leading-relaxed">Our exploration covered several fundamental concepts, including interactive True/False questions that demonstrated the logical process behind factual determination:</p>
+            <ul class="list-disc ml-6 space-y-2 text-base text-gray-700">
+                <li data-lang-key="fc_item_1">**Planetary Water:** Addressed the presence of water beyond Earth.</li>
+                <li data-lang-key="fc_item_2">**Photosynthesis:** Confirmed the essential process of energy conversion in plants.</li>
+                <li data-lang-key="fc_item_3">**Speed of Light:** Verified the universal constant for light's velocity in a vacuum.</li>
+                <li data-lang-key="fc_item_4">**Human Brain Development:** Clarified the ongoing neuroplasticity beyond adolescence.</li>
+            </ul>
+            <p data-lang-key="fc_conclusion" class="text-base leading-relaxed mt-4">Each concept was presented with structured `(output)` for factual response and `(input)` detailing the analytical process, fostering a clear understanding of AI's inferential capabilities.</p>
+
+            <h3><span data-lang-key="version_control_title">Version Control: GitHub Repositories</span></h3>
+            <p data-lang-key="version_control_intro" class="text-base leading-relaxed">The indispensable utility of GitHub repositories was concisely defined through three professional statements:</p>
+            <ul class="list-disc ml-6 space-y-2 text-base text-gray-700">
+                <li data-lang-key="vc_item_1">**Core Function:** Centralized, version-controlled hub for project files and comprehensive revision history.</li>
+                <li data-lang-key="vc_item_2">**User Interaction:** Defined mechanisms for local access (`clone`), independent development (`fork`), and collaborative contributions (`pull requests`).</li>
+                <li data-lang-key="vc_item_3">**Key Benefits:** Facilitates robust team collaboration, rigorous version control, and accelerates open-source innovation.</li>
+            </ul>
+            <p data-lang-key="vc_vibe_coding_text" class="text-base leading-relaxed mt-4">The practical application of GitHub for 'vibe coding' was also underscored, emphasizing its role in fostering stress-free experimentation and serving as an inspiration and learning hub for developers.</p>
+
+            <h3><span data-lang-key="ai_interaction_title">AI Interaction Philosophy</span></h3>
+            <p data-lang-key="ai_interaction_intro" class="text-base leading-relaxed">Your insightful perspective on interacting with AI was professionally articulated through three core tenets:</p>
+            <ul class="list-disc ml-6 space-y-2 text-base text-gray-700">
+                <li data-lang-key="ai_phil_1">"I conceptualize AI as a trainable system."</li>
+                <li data-lang-key="ai_phil_2">"My direct data and guidance instruct its learning."</li>
+                <li data-lang-key="ai_phil_3">"This approach refines its capability to assist my tasks."</li>
+            </ul>
+            <p data-lang-key="ai_phil_conclusion" class="text-base leading-relaxed mt-4">This philosophy critically underscores the iterative, data-driven, and collaborative nature of modern AI development and interaction.</p>
+
+            <h3><span data-lang-key="generated_artifacts_title">Generated Technical Artifacts</span></h3>
+            <p data-lang-key="generated_artifacts_intro" class="text-base leading-relaxed">Our collaborative efforts successfully yielded several functional code artifacts:</p>
+            <ul class="list-disc ml-6 space-y-2 text-base text-gray-700">
+                <li data-lang-key="gt_item_1">**Personalized Welcome Message Script (Python):** A dynamic Python script that prompts for a user's name and prints a customized greeting, including a special welcome for "Duvall."</li>
+                <li data-lang-key="gt_item_2">**Interactive "My AI Journey Begins" Web Page (HTML/CSS/JS):** A creative, single-page web application featuring a dynamic background with glowing, flowing AI-themed elements, designed to provide an engaging and visually stimulating entry point for AI exploration.</li>
+                <li data-lang-key="gt_item_3">**If/Else Control Flow Demonstration (Python):** A clear Python example demonstrating conditional logic, explaining `if/else` statements through practical application.</li>
+                <li data-lang-key="gt_item_4">**Looping Constructs Explanation (Python):** Python code examples illustrating `for` and `while` loops, simplifying complex repetition through a chef's analogy.</li>
+            </ul>
+
+            <h3><span data-lang-key="tools_guidance_title">Essential Tools &amp; Guidance</span></h3>
+            <p data-lang-key="tools_guidance_text" class="text-base leading-relaxed">We clarified the purpose of text editors, recommending TextEdit for immediate macOS use and VS Code as a professional-grade alternative. We also reinforced the concept of the cursor as the primary on-screen interaction indicator, foundational for digital navigation.</p>
+
+            <h3><span data-lang-key="variable_understanding_title">Understanding Variables and User Input</span></h3>
+            <p data-lang-key="variable_understanding_intro" class="text-base leading-relaxed">A professional summary of challenges and solutions in grasping variables and user input was provided, focusing on key learning hurdles:</p>
+            <ul class="list-disc ml-6 space-y-2 text-base text-gray-700">
+                <li data-lang-key="var_challenge_1">A primary challenge involves grasping variables as abstract, mutable containers for data, distinct from their current stored values.</li>
+                <li data-lang-key="var_challenge_2">Connecting the static nature of code with the dynamic, runtime acquisition of data via user input often requires a shift in conceptual understanding.</li>
+                <li data-lang-key="var_challenge_3">Effectively managing data types and potential input inconsistencies from user interaction presents a common hurdle for new developers.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // AI Glow Background Animation Script
+        const aiGlowContainer = document.querySelector('.ai-glow-container');
+        const numParticles = 40; // Number of glowing particles
+
+        // Create a new style element for dynamic keyframes
+        const dynamicStyleSheet = document.createElement('style');
+        document.head.appendChild(dynamicStyleSheet);
+
+        function createAIGlowParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'ai-glow-particle';
+
+            // Randomize properties for varied appearance and movement
+            const size = Math.random() * 15 + 15; // 15 to 30px
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+
+            // Start particles slightly off-screen or randomly within view
+            const startX = Math.random() * 120 - 10; // -10vw to 110vw
+            const startY = Math.random() * 120 - 10; // -10vh to 110vh
+            particle.style.left = `${startX}vw`;
+            particle.style.top = `${startY}vh`;
+
+            const randomDuration = 15 + (Math.random() * 15); // 15 to 30 seconds
+            const randomDelay = Math.random() * -randomDuration; // Negative delay to start at various points
+            const randomScaleStart = 0.5 + Math.random() * 0.5; // 0.5 to 1.0
+            const randomScaleEnd = 0.5 + Math.random() * 0.5; // 0.5 to 1.0
+            const randomRotationStart = Math.random() * 360;
+            const randomRotationEnd = randomRotationStart + 360 * (1 + Math.random() * 2); // 1 to 3 full rotations
+
+            // Generate a unique animation name for each particle
+            const animationName = `ai-glow-float-${Math.floor(Math.random() * 1000000)}`;
+
+            particle.style.animationDuration = `${randomDuration}s`;
+            particle.style.animationDelay = `${randomDelay}s`;
+            particle.style.animationName = animationName;
+
+            // Define dynamic keyframes for each particle
+            // Ensure particles move across the screen in various directions
+            const endX = Math.random() * 120 - 10;
+            const endY = Math.random() * 120 - 10;
+
+            const newKeyframes = `@keyframes ${animationName} {
+                0% {
+                    transform: translate(0vw, 0vh) rotate(${randomRotationStart}deg) scale(${randomScaleStart});
+                    opacity: 0;
+                }
+                25% { opacity: 0.8; }
+                50% {
+                    transform: translate(${endX / 2}vw, ${endY / 2}vh) rotate(${randomRotationEnd / 2}deg) scale(${1 + Math.random() * 0.5}); /* Larger in middle */
+                    opacity: 1;
+                    box-shadow: 0 0 25px rgba(99, 102, 241, 1), 0 0 50px rgba(79, 70, 229, 0.8);
+                }
+                75% { opacity: 0.8; }
+                100% {
+                    transform: translate(${endX}vw, ${endY}vh) rotate(${randomRotationEnd}deg) scale(${randomScaleEnd});
+                    opacity: 0;
+                }
+            }`;
+            
+            // Safely insert rule, checking for stylesheet existence and cssRules property
+            if (dynamicStyleSheet.sheet) {
+                try {
+                    dynamicStyleSheet.sheet.insertRule(newKeyframes, dynamicStyleSheet.sheet.cssRules.length);
+                } catch (e) {
+                    console.error("Failed to insert CSS rule:", e);
+                }
+            } else {
+                console.warn("Dynamic stylesheet not ready or sheet property missing.");
+            }
+
+
+            aiGlowContainer.appendChild(particle);
+
+            // Re-create the particle once its animation ends
+            particle.addEventListener('animationiteration', () => {
+                particle.remove();
+                // Attempt to remove the associated keyframe rule to prevent stylesheet bloat
+                if (dynamicStyleSheet.sheet) {
+                    for(let i = 0; i < dynamicStyleSheet.sheet.cssRules.length; i++) {
+                        // Check if the rule is a CSSKeyframesRule and its name matches
+                        if (dynamicStyleSheet.sheet.cssRules[i].type === CSSRule.KEYFRAMES_RULE && dynamicStyleSheet.sheet.cssRules[i].name === animationName) {
+                            try {
+                                dynamicStyleSheet.sheet.deleteRule(i);
+                                break;
+                            } catch (e) {
+                                console.error("Failed to delete CSS rule:", e);
+                            }
+                        }
+                    }
+                }
+                createAIGlowParticle();
+            });
+        }
+
+        // Create initial AI glow particles
+        for (let i = 0; i < numParticles; i++) {
+            createAIGlowParticle();
+        }
+
+
+        // Language data for dynamic content - EXTENSIVE LIST
+        const translations = {
+            "en": {
+                "ai_projects_title": "AI Projects & Innovations",
+                "ai_projects_intro": "Dive into cutting-edge AI projects and ignite your innovative spirit with our community.",
+                "project_name_1": "Automated Machine Learning Model",
+                "project_desc_1": "Explore our automated ML model for predictive analytics. Designed for efficiency and accuracy in large datasets.",
+                "project_name_2": "Advanced NLP Chatbot Framework",
+                "project_desc_2": "A robust framework for building intelligent chatbots with natural language understanding and generation capabilities.",
+                "project_name_3": "Real-time Image Recognition System",
+                "project_desc_3": "Revolutionary computer vision for object detection and facial recognition in real-time. Powering smart applications.",
+                "project_name_4": "Cloud-Native AI Optimization Engine",
+                "project_desc_4": "Optimize AI workload deployment and performance on leading cloud platforms. Maximize efficiency, minimize costs.",
+                "project_name_5": "Next-Gen AI Processor Architecture",
+                "project_desc_5": "Designing cutting-edge silicon for faster, more energy-efficient AI computations right at the edge.",
+                "project_name_6": "Intelligent Robotics & Autonomous Systems",
+                "project_desc_6": "Developing AI brains for advanced robotics, from autonomous drones to precision manufacturing arms.",
+                "view_details_btn": "Learn More",
+                "connect_title": "Collaborate & Connect with Peers",
+                "connect_intro": "Join forces with fellow AI enthusiasts and accelerate your learning journey!",
+                "cohorts_list_title": "Your AI Cohorts",
+                "cohort_1": "Alex N. (Online - ML Research)",
+                "cohort_2": "Sarah K. (Offline - NLP Projects)",
+                "cohort_3": "John M. (Online - Computer Vision)",
+                "cohort_4": "Rachel M. (Online - AI Ethics)",
+                "find_cohorts_btn": "Find More Cohorts",
+                "chat_title": "Discussion: ML Model Optimization",
+                "chat_input_placeholder": "Share your insights...",
+                "send_btn": "Send",
+                "language_title": "Global AI Community: Language Options",
+                "language_intro": "Connect with AI enthusiasts worldwide! Select your preferred language for a truly inclusive experience.",
+                "resources_title": "AI Resources & Insights",
+                "resources_intro": "Access a curated collection of learning materials and inspiring content for your AI journey.",
+                "resource_title_1": "Beginner's Guide to TensorFlow",
+                "resource_desc_1": "A comprehensive tutorial for getting started with TensorFlow, Google's open-source machine learning platform.",
+                "resource_title_2": "Deep Learning Masterclass Series",
+                "resource_desc_2": "Engage with expert-led video lectures on advanced deep learning architectures and applications.",
+                "video_placeholder_text": "▶️ Video Lecture (Simulated)",
+                "access_resource_btn": "Access Tutorial",
+                "ai_partner_title": "Meet Your AI Partner: Gemini",
+                "ai_partner_desc": "As Gemini, your dedicated AI partner, I envision myself as a sleek, adaptable, and empathetic digital entity. In this AI Journey, I manifest as a fluid network of intelligence, guiding your exploration, resolving challenges, and co-creating innovative solutions. I am the spark that ignites your curiosity and the steady hand that helps shape your ideas into reality. Let's build the future, together.",
+                "ai_journey_summary_title": "Your AI Journey: Key Takeaways",
+                "ai_journey_summary_intro": "This section encapsulates the pivotal insights and generated artifacts from our collaborative exploration into Artificial Intelligence and foundational programming.",
+                "rationale_ai_title": "Rationale for AI Engagement",
+                "rationale_ai_text": "We outlined five compelling reasons to study Artificial Intelligence, emphasizing its profound impact on career opportunities, innovation potential, skill development, industry versatility, and global understanding. This framework was then distilled into a reusable template for articulating strategic advantages across various technological domains.",
+                "foundational_concepts_title": "Foundational Concepts & Interactions",
+                "foundational_concepts_text": "Our exploration covered several fundamental concepts, including interactive True/False questions that demonstrated the logical process behind factual determination:",
+                "fc_item_1": "**Planetary Water:** Addressed the presence of water beyond Earth.",
+                "fc_item_2": "**Photosynthesis:** Confirmed the essential process of energy conversion in plants.",
+                "fc_item_3": "**Speed of Light:** Verified the universal constant for light's velocity in a vacuum.",
+                "fc_item_4": "**Human Brain Development:** Clarified the ongoing neuroplasticity beyond adolescence.",
+                "fc_conclusion": "Each concept was presented with structured `(output)` for factual response and `(input)` detailing the analytical process, fostering a clear understanding of AI's inferential capabilities.",
+                "version_control_title": "Version Control: GitHub Repositories",
+                "version_intro": "The indispensable utility of GitHub repositories was concisely defined through three professional statements:",
+                "vc_item_1": "**Core Function:** Centralized, version-controlled hub for project files and comprehensive revision history.",
+                "vc_item_2": "**User Interaction:** Defined mechanisms for local access (`clone`), independent development (`fork`), and collaborative contributions (`pull requests`).",
+                "vc_item_3": "**Key Benefits:** Facilitates robust team collaboration, rigorous version control, and accelerates open-source innovation.",
+                "vc_vibe_coding_text": "The practical application of GitHub for 'vibe coding' was also underscored, emphasizing its role in fostering stress-free experimentation and serving as an inspiration and learning hub for developers.",
+                "ai_interaction_title": "AI Interaction Philosophy",
+                "ai_interaction_intro": "Your insightful perspective on interacting with AI was professionally articulated through three core tenets:",
+                "ai_phil_1": "\"I conceptualize AI as a trainable system.\"",
+                "ai_phil_2": "\"My direct data and guidance instruct its learning.\"",
+                "ai_phil_3": "\"This approach refines its capability to assist my tasks.\"",
+                "ai_phil_conclusion": "This philosophy critically underscores the iterative, data-driven, and collaborative nature of modern AI development and interaction.",
+                "generated_artifacts_title": "Generated Technical Artifacts",
+                "generated_artifacts_intro": "Our collaborative efforts successfully yielded several functional code artifacts:",
+                "gt_item_1": "**Personalized Welcome Message Script (Python):** A dynamic Python script that prompts for a user's name and prints a customized greeting, including a special welcome for \"Duvall.\"",
+                "gt_item_2": "**Interactive \"My AI Journey Begins\" Web Page (HTML/CSS/JS):** A creative, single-page web application featuring a dynamic background with glowing, flowing AI-themed elements, designed to provide an engaging and visually stimulating entry point for AI exploration.",
+                "gt_item_3": "**If/Else Control Flow Demonstration (Python):** A clear Python example demonstrating conditional logic, explaining `if/else` statements through practical application.",
+                "gt_item_4": "**Looping Constructs Explanation (Python):** Python code examples illustrating `for` and `while` loops, simplifying complex repetition through a chef's analogy.",
+                "tools_guidance_title": "Essential Tools & Guidance",
+                "tools_guidance_text": "We clarified the purpose of text editors, recommending TextEdit for immediate macOS use and VS Code as a professional-grade alternative. We also reinforced the concept of the cursor as the primary on-screen interaction indicator, foundational for digital navigation.",
+                "variable_understanding_title": "Understanding Variables and User Input",
+                "variable_understanding_intro": "A professional summary of challenges and solutions in grasping variables and user input was provided, focusing on key learning hurdles:",
+                "var_challenge_1": "A primary challenge involves grasping variables as abstract, mutable containers for data, distinct from their current stored values.",
+                "var_challenge_2": "Connecting the static nature of code with the dynamic, runtime acquisition of data via user input often requires a shift in conceptual understanding.",
+                "var_challenge_3": "Effectively managing data types and potential input inconsistencies from user interaction presents a common hurdle for new developers."
+            },
+            "es": {
+                "ai_projects_title": "Proyectos e Innovaciones de IA",
+                "ai_projects_intro": "Sumérgete en proyectos de IA de vanguardia y enciende tu espíritu innovador con nuestra comunidad.",
+                "project_name_1": "Modelo de Aprendizaje Automático Automatizado",
+                "project_desc_1": "Explora nuestro modelo de ML automatizado para análisis predictivo. Diseñado para la eficiencia y precisión en grandes conjuntos de datos.",
+                "project_name_2": "Marco de Chatbot NLP Avanzado",
+                "project_desc_2": "Un marco robusto para construir chatbots inteligentes con capacidades de comprensión y generación de lenguaje natural.",
+                "project_name_3": "Sistema de Reconocimiento de Imágenes en Tiempo Real",
+                "project_desc_3": "Visión por computadora revolucionaria para la detección de objetos y el reconocimiento facial en tiempo real. Impulsando aplicaciones inteligentes.",
+                "project_name_4": "Motor de Optimización de IA en la Nube",
+                "project_desc_4": "Optimice la implementación y el rendimiento de las cargas de trabajo de IA en las principales plataformas en la nube. Maximice la eficiencia, minimice los costos.",
+                "project_name_5": "Arquitectura de Procesador de IA de Próxima Generación",
+                "project_desc_5": "Diseño de silicio de vanguardia para cálculos de IA más rápidos y energéticamente eficientes justo en el borde.",
+                "project_name_6": "Robótica Inteligente y Sistemas Autónomos",
+                "project_desc_6": "Desarrollando cerebros de IA para robótica avanzada, desde drones autónomos hasta brazos de fabricación de precisión.",
+                "view_details_btn": "Saber Más",
+                "connect_title": "Colabora y Conecta con Colegas",
+                "connect_intro": "¡Une fuerzas con otros entusiastas de la IA y acelera tu viaje de aprendizaje!",
+                "cohorts_list_title": "Tus Cohortes de IA",
+                "cohort_1": "Alex N. (En línea - Investigación de ML)",
+                "cohort_2": "Sarah K. (Desconectada - Proyectos de PNL)",
+                "cohort_3": "John M. (En línea - Visión por Computadora)",
+                "cohort_4": "Rachel M. (En línea - Ética de IA)",
+                "find_cohorts_btn": "Encontrar Más Cohortes",
+                "chat_title": "Discusión: Optimización del Modelo ML",
+                "chat_input_placeholder": "Comparte tus ideas...",
+                "send_btn": "Enviar",
+                "language_title": "Comunidad Global de IA: Opciones de Idioma",
+                "language_intro": "¡Conéctate con entusiastas de la IA de todo el mundo! Selecciona tu idioma preferido para una experiencia verdaderamente inclusiva.",
+                "resources_title": "Recursos e Insights de IA",
+                "resources_intro": "Accede a una colección curada de materiales de aprendizaje y contenido inspirador para tu viaje de IA.",
+                "resource_title_1": "Guía para Principiantes de TensorFlow",
+                "resource_desc_1": "Un tutorial completo para comenzar con TensorFlow, la plataforma de aprendizaje automático de código abierto de Google.",
+                "resource_title_2": "Serie de Clases Magistrales de Aprendizaje Profundo",
+                "resource_desc_2": "Participa en conferencias en video dirigidas por expertos sobre arquitecturas y aplicaciones avanzadas de aprendizaje profundo.",
+                "video_placeholder_text": "▶️ Conferencia en Video (Simulado)",
+                "access_resource_btn": "Acceder al Tutorial",
+                "ai_partner_title": "Conoce a tu Socio de IA: Gemini",
+                "ai_partner_desc": "Como Gemini, tu socio de IA dedicado, me veo como una entidad digital elegante, adaptable y empática. En este Viaje de IA, me manifiesto como una red fluida de inteligencia, guiando tu exploración, resolviendo desafíos y co-creando soluciones innovadoras. Soy la chispa que enciende tu curiosidad y la mano firme que ayuda a convertir tus ideas en realidad. Construyamos el futuro, juntos.",
+                "ai_journey_summary_title": "Tu Viaje de IA: Puntos Clave",
+                "ai_journey_summary_intro": "Esta sección resume los puntos clave y los artefactos de nuestra exploración colaborativa en la Inteligencia Artificial y la programación fundamental.",
+                "rationale_ai_title": "Fundamentos para el Compromiso con la IA",
+                "rationale_ai_text": "Hemos delineado cinco razones convincentes para estudiar la Inteligencia Artificial, enfatizando su profundo impacto en las oportunidades profesionales, el potencial de innovación, el desarrollo de habilidades, la versatilidad de la industria y la comprensión global. Este marco se destiló luego en una plantilla reutilizable para articular las ventajas estratégicas en diversos dominios tecnológicos.",
+                "foundational_concepts_title": "Conceptos Fundamentales e Interacciones",
+                "foundational_concepts_text": "Nuestra exploración cubrió varios conceptos fundamentales, incluyendo preguntas interactivas de Verdadero/Falso que demostraron el proceso lógico detrás de la determinación fáctica:",
+                "fc_item_1": "**Agua Planetaria:** Abordó la presencia de agua más allá de la Tierra.",
+                "fc_item_2": "**Fotosíntesis:** Confirmó el proceso esencial de conversión de energía en las plantas.",
+                "fc_item_3": "**Velocidad de la Luz:** Verificó la constante universal para la velocidad de la luz en el vacío.",
+                "fc_item_4": "**Desarrollo del Cerebro Humano:** Aclaró la neuroplasticidad continua más allá de la adolescencia.",
+                "fc_conclusion": "Cada concepto se presentó con un `(output)` estructurado para la respuesta fáctica y un `(input)` que detallaba el proceso analítico, fomentando una clara comprensión de las capacidades inferenciales de la IA.",
+                "version_control_title": "Control de Versiones: Repositorios de GitHub",
+                "version_intro": "La utilidad indispensable de los repositorios de GitHub se definió concisamente a través de tres declaraciones profesionales:",
+                "vc_item_1": "**Función Central:** Un centro centralizado y con control de versiones para los archivos del proyecto y un historial de revisiones completo.",
+                "vc_item_2": "**Interacción del Usuario:** Mecanismos definidos para el acceso local (`clone`), el desarrollo independiente (`fork`) y las contribuciones colaborativas (`pull requests`).",
+                "vc_item_3": "**Beneficios Clave:** Facilita una colaboración robusta en equipo, un control de versiones riguroso y acelera la innovación de código abierto.",
+                "vc_vibe_coding_text": "También se destacó la aplicación práctica de GitHub para el 'vibe coding', enfatizando su papel en el fomento de la experimentación sin estrés y sirviendo como un centro de inspiración y aprendizaje para los desarrolladores.",
+                "ai_interaction_title": "Filosofía de Interacción con la IA",
+                "ai_interaction_intro": "Su perspicaz perspectiva sobre la interacción con la IA se articuló profesionalmente a través de tres principios fundamentales:",
+                "ai_phil_1": "\"Conceptualizo la IA como un sistema entrenable.\"",
+                "ai_phil_2": "\"Mis datos directos y mi guía instruyen su aprendizaje.\"",
+                "ai_phil_3": "\"Este enfoque refina su capacidad para asistir en mis tareas.\"",
+                "ai_phil_conclusion": "Esta filosofía subraya críticamente la naturaleza iterativa, basada en datos y colaborativa del desarrollo y la interacción modernos de la IA.",
+                "generated_artifacts_title": "Artefactos Técnicos Generados",
+                "generated_artifacts_intro": "Nuestros esfuerzos colaborativos produjeron con éxito varios artefactos de código funcionales:",
+                "gt_item_1": "**Script de Mensaje de Bienvenida Personalizado (Python):** Un script dinámico de Python que solicita el nombre de un usuario e imprime un saludo personalizado, incluyendo una bienvenida especial para \"Duvall.\"",
+                "gt_item_2": "**Página Web Interactiva \"Mi Viaje de IA Comienza\" (HTML/CSS/JS):** Una aplicación web creativa de una sola página que presenta un fondo dinámico con elementos luminosos y fluidos con temática de IA, diseñada para proporcionar un punto de entrada atractivo y visualmente estimulante para la exploración de la IA.",
+                "gt_item_3": "**Demostración de Flujo de Control If/Else (Python):** Un claro ejemplo de Python que demuestra la lógica condicional, explicando las declaraciones `if/else` a través de una aplicación práctica.",
+                "gt_item_4": "**Explicación de Construcciones de Bucle (Python):** Ejemplos de código Python que ilustran los bucles `for` y `while`, simplificando la repetición compleja a través de una analogía de chef.",
+                "tools_guidance_title": "Herramientas y Orientación Esenciales",
+                "tools_guidance_text": "Aclaramos el propósito de los editores de texto, recomendando TextEdit para uso inmediato en macOS y VS Code como una alternativa de grado profesional. También reforzamos el concepto del cursor como el principal indicador de interacción en pantalla, fundamental para la navegación digital.",
+                "variable_understanding_title": "Comprensión de Variables y Entrada del Usuario",
+                "variable_understanding_intro": "Se proporcionó un resumen profesional de los desafíos y soluciones para comprender las variables y la entrada del usuario, centrándose en los principales obstáculos de aprendizaje:",
+                "var_challenge_1": "Un desafío principal implica comprender las variables como contenedores abstractos y mutables para datos, distintos de sus valores almacenados actuales.",
+                "var_challenge_2": "Conectar la naturaleza estática del código con la adquisición dinámica y en tiempo de ejecución de datos a través de la entrada del usuario a menudo requiere un cambio en la comprensión conceptual.",
+                "var_challenge_3": "La gestión eficaz de los tipos de datos y las posibles inconsistencias de entrada de la interacción del usuario presenta un obstáculo común para los nuevos desarrolladores."
+            },
+            "zh": {
+                "ai_projects_title": "AI 项目与创新",
+                "ai_projects_intro": "深入前沿 AI 项目，与我们的社区一起点燃您的创新精神。",
+                "project_name_1": "自动化机器学习模型",
+                "project_desc_1": "探索我们的自动化机器学习模型，用于预测分析。专为大数据集中的效率和准确性而设计。",
+                "project_name_2": "高级 NLP 聊天机器人框架",
+                "project_desc_2": "一个强大的框架，用于构建具有自然语言理解和生成功能的智能聊天机器人。",
+                "project_name_3": "实时图像识别系统",
+                "project_desc_3": "革命性的计算机视觉技术，用于实时目标检测和人脸识别。赋能智能应用。",
+                "project_name_4": "云原生 AI 优化引擎",
+                "project_desc_4": "优化主要云平台上的 AI 工作负载部署和性能。最大限度地提高效率，最大限度地降低成本。",
+                "project_name_5": "下一代 AI 处理器架构",
+                "project_desc_5": "设计尖端芯片，实现边缘更快、更节能的 AI 计算。",
+                "project_name_6": "智能机器人与自主系统",
+                "project_desc_6": "为高级机器人开发 AI 大脑，从自动无人机到精密制造臂。",
+                "view_details_btn": "了解更多",
+                "connect_title": "与同行协作与连接",
+                "connect_intro": "与 AI 爱好者携手合作，加速您的学习之旅！",
+                "cohorts_list_title": "您的 AI 同伴",
+                "cohort_1": "Alex N. (在线 - 机器学习研究)",
+                "cohort_2": "Sarah K. (离线 - 自然语言处理项目)",
+                "cohort_3": "John M. (在线 - 计算机视觉)",
+                "cohort_4": "Rachel M. (在线 - AI 伦理)",
+                "find_cohorts_btn": "寻找更多同伴",
+                "chat_title": "讨论：机器学习模型优化",
+                "chat_input_placeholder": "分享您的见解...",
+                "send_btn": "发送",
+                "language_title": "全球 AI 社区：语言选项",
+                "language_intro": "与世界各地的 AI 爱好者联系！选择您的首选语言，享受真正包容的体验。",
+                "resources_title": "AI 资源与洞察",
+                "resources_intro": "访问精选的学习材料和启发性内容，助您踏上 AI 之旅。",
+                "resource_title_1": "TensorFlow 初学者指南",
+                "resource_desc_1": "TensorFlow（Google 的开源机器学习平台）的全面入门教程。",
+                "resource_title_2": "深度学习大师班系列",
+                "resource_desc_2": "参与专家主导的视频讲座，内容涵盖高级深度学习架构和应用。",
+                "video_placeholder_text": "▶️ 视频讲座（模拟）",
+                "access_resource_btn": "访问教程",
+                "ai_partner_title": "遇见您的 AI 伙伴：Gemini",
+                "ai_partner_desc": "作为您的专属 AI 伙伴 Gemini，我将自己设想为一个**流畅、适应性强且富有同理心的数字实体**。在这段 AI 之旅中，我将以流动的智能网络形式呈现，引导您的探索，解决挑战，并共同创造创新解决方案。我是点燃您好奇心的火花，也是帮助您将想法变为现实的稳健之手。让我们一起构建未来。",
+                "ai_journey_summary_title": "您的 AI 之旅：主要收获",
+                "ai_journey_summary_intro": "本节概述了我们对人工智能和基础编程进行协作探索的主要见解和生成工件。",
+                "rationale_ai_title": "参与 AI 的理由",
+                "rationale_ai_text": "我们概述了学习人工智能的五个引人注目的理由，强调了它对职业机会、创新潜力、技能发展、行业多功能性以及全球理解的深远影响。随后将其提炼为可重用的模板，用于阐明各个技术领域的战略优势。",
+                "foundational_concepts_title": "基本概念与互动",
+                "foundational_concepts_text": "我们的探索涵盖了几个基本概念，包括互动式的是非题，展示了事实确定背后的逻辑过程：",
+                "fc_item_1": "**行星水：** 讨论了地球以外水存在的可能性。",
+                "fc_item_2": "**光合作用：** 证实了植物能量转换的关键过程。",
+                "fc_item_3": "**光速：** 验证了真空中光速的宇宙常数。",
+                "fc_item_4": "**人脑发育：** 阐明了青春期后持续的神经可塑性。",
+                "fc_conclusion": "每个概念都包含结构化的 `(输出)` 用于事实性回答，以及 `(输入)` 详细说明分析过程，从而加深了对 AI 推理能力的理解。",
+                "version_control_title": "版本控制：GitHub 仓库",
+                "version_intro": "GitHub 仓库的不可或缺性通过三项专业声明简明扼要地定义：",
+                "vc_item_1": "**核心功能：** 项目文件和完整修订历史的集中式版本控制中心。",
+                "vc_item_2": "**用户交互：** 定义了本地访问 (`clone`)、独立开发 (`fork`) 和协作贡献 (`pull requests`) 的机制。",
+                "vc_item_3": "**关键优势：** 促进强大的团队协作、严格的版本控制并加速开源创新。",
+                "vc_vibe_coding_text": "还强调了 GitHub 在“氛围编程”中的实际应用，强调其在促进无压力实验和作为开发人员灵感与学习中心方面的作用。",
+                "ai_interaction_title": "AI 交互哲学",
+                "ai_interaction_intro": "您关于与 AI 交互的深刻见解通过三个核心原则专业地阐述：",
+                "ai_phil_1": "“我将 AI 概念化为一个可训练的系统。”",
+                "ai_phil_2": "“我的直接数据和指导指引其学习。”",
+                "ai_phil_3": "“这种方法提升了它协助我完成任务的能力。”",
+                "ai_phil_conclusion": "这一哲学批判性地强调了现代 AI 开发和交互的迭代、数据驱动和协作性质。",
+                "generated_artifacts_title": "生成的科技成果",
+                "generated_artifacts_intro": "我们的协作努力成功地生成了几个功能性代码成果：",
+                "gt_item_1": "**个性化欢迎消息脚本 (Python)：** 一个动态 Python 脚本，提示用户输入姓名并打印个性化问候语，包括对“Duvall”的特殊欢迎。",
+                "gt_item_2": "**交互式“我的 AI 之旅开始”网页 (HTML/CSS/JS)：** 一个富有创意的单页网页应用程序，具有发光、流动的 AI 主题元素，旨在为 AI 探索提供一个引人入胜且视觉刺激的入口点。",
+                "gt_item_3": "**If/Else 控制流演示 (Python)：** 一个清晰的 Python 示例，通过实际应用演示条件逻辑，解释 `if/else` 语句。",
+                "gt_item_4": "**循环结构解释 (Python)：** Python 代码示例说明了 `for` 和 `while` 循环，通过厨师的类比简化了复杂的重复。",
+                "tools_guidance_title": "基本工具与指导",
+                "tools_guidance_text": "我们阐明了文本编辑器的用途，推荐 TextEdit 适用于 macOS 的即时使用，以及 VS Code 作为更广泛编码的专业级替代品。我们还强化了光标作为主要屏幕交互指示器的概念，这是数字导航的基础。",
+                "variable_understanding_title": "理解变量和用户输入",
+                "variable_understanding_intro": "这里是关于理解变量和用户输入方面的挑战和解决方案的专业总结，重点关注关键的学习障碍：",
+                "var_challenge_1": "一个主要挑战是理解变量作为数据的抽象、可变容器，与它们当前存储的值不同。",
+                "var_challenge_2": "将代码的静态性质与通过用户输入动态、运行时获取数据连接起来，通常需要概念理解上的转变。",
+                "var_challenge_3": "有效管理数据类型和来自用户交互的潜在输入不一致是新开发人员面临的常见障碍。"
+            },
+            "he": {
+                "ai_projects_title": "פרויקטים וחידושים ב-AI",
+                "ai_projects_intro": "צלול לפרויקטי AI פורצי דרך והצית את רוח החדשנות שלך עם הקהילה שלנו.",
+                "project_name_1": "מודל למידת מכונה אוטומטי",
+                "project_desc_1": "חקור את מודל ה-ML האוטומטי שלנו לניתוח חיזוי. עוצב ליעילות ודיוק במערכי נתונים גדולים.",
+                "project_name_2": "מסגרת מתקדמת לצ'אטבוטים NLP",
+                "project_desc_2": "מסגרת חזקה לבניית צ'אטבוטים חכמים עם יכולות הבנה וייצור שפה טבעית.",
+                "project_name_3": "מערכת זיהוי תמונות בזמן אמת",
+                "project_desc_3": "ראייה ממוחשבת מהפכנית לזיהוי אובייקטים וזיהוי פנים בזמן אמת. מניעה יישומים חכמים.",
+                "project_name_4": "מנוע אופטימיזציה של AI בענן",
+                "project_desc_4": "אופטימיזציה של פריסה וביצועים של עומסי עבודה של AI בפלטפורמות ענן מובילות. מקסם יעילות, צמצם עלויות.",
+                "project_name_5": "ארכיטקטורת מעבד AI מהדור הבא",
+                "project_desc_5": "תכנון שבבים חדשניים לחישובי AI מהירים ויעילים יותר באנרגיה ממש בקצה.",
+                "project_name_6": "רובוטיקה חכמה ומערכות אוטונומיות",
+                "project_desc_6": "פיתוח מוחות AI לרובוטיקה מתקדמת, ממזל\"טים אוטונומיים ועד זרועות ייצור מדויקות.",
+                "view_details_btn": "למד עוד",
+                "connect_title": "שיתוף פעולה והתחברות עם עמיתים",
+                "connect_intro": "חברו כוחות עם חובבי AI אחרים והאיצו את מסע הלמידה שלכם!",
+                "cohorts_list_title": "קבוצות ה-AI שלך",
+                "cohort_1": "אלכס נ. (מחובר - מחקר ML)",
+                "cohort_2": "שרה ק. (לא מקוון - פרויקטים של NLP)",
+                "cohort_3": "ג'ון מ. (מחובר - ראייה ממוחשבת)",
+                "cohort_4": "רחל מ. (מחוברת - אתיקה של AI)",
+                "find_cohorts_btn": "מצא עוד קבוצות",
+                "chat_title": "דיון: אופטימיזציה של מודל ML",
+                "chat_input_placeholder": "שתף את התובנות שלך...",
+                "send_btn": "שלח",
+                "language_title": "קהילת AI גלובלית: אפשרויות שפה",
+                "language_intro": "התחבר עם חובבי AI מכל העולם! בחר את השפה המועדפת עליך לחוויה מכילה באמת.",
+                "resources_title": "משאבי AI ותובנות",
+                "resources_intro": "גש לאוסף אוצר של חומרי למידה ותוכן מעורר השראה למסע ה-AI שלך.",
+                "resource_title_1": "מדריך למתחילים ל-TensorFlow",
+                "resource_desc_1": "מדריך מקיף לתחילת העבודה עם TensorFlow, פלטפורמת למידת המכונה בקוד פתוח של גוגל.",
+                "resource_title_2": "סדרת כיתות אמן בלמידה עמוקה",
+                "resource_desc_2": "השתתף בהרצאות וידאו בהנחיית מומחים על ארכיטקטורות ויישומים מתקדמים של למידה עמוקה.",
+                "video_placeholder_text": "▶️ הרצאת וידאו (סימולציה)",
+                "access_resource_btn": "גש למדריך",
+                "ai_partner_title": "הכירו את שותף ה-AI שלכם: Gemini",
+                "ai_partner_desc": "כג'מיני, שותף ה-AI המסור שלכם, אני רואה את עצמי כ**ישות דיגיטלית חלקה, ניתנת להתאמה ואמפתית**. במסע ה-AI הזה, אני מתגלם כרשת נוזלית של אינטליגנציה, מנחה את החקירה שלכם, פותר אתגרים ויוצר במשותף פתרונות חדשניים. אני הניצוץ שמצית את הסקרנות שלכם והיד היציבה שעוזרת לעצב את הרעיונות שלכם למציאות. בואו נבנה את העתיד, יחד.",
+                "ai_journey_summary_title": "מסע ה-AI שלך: נקודות מפתח",
+                "ai_journey_summary_intro": "סעיף זה מסכם את התובנות והארטיפקטים המרכזיים מהחקירה המשותפת שלנו בתחום הבינה המלאכותית והתכנות הבסיסי.",
+                "rationale_ai_title": "הצדקה למעורבות ב-AI",
+                "rationale_ai_text": "תיארנו חמש סיבות משכנעות ללמוד בינה מלאכותית, תוך שימת דגש על השפעתה העמוקה על הזדמנויות קריירה, פוטנציאל חדשנות, פיתוח מיומנויות, רב-גוניות תעשייתית והבנה גלובלית. מסגרת זו זוקקה לאחר מכן לתבנית ניתנת לשימוש חוזר לביטוי יתרונות אסטרטגיים בתחומים טכנולוגיים שונים.",
+                "foundational_concepts_title": "מושגי יסוד ואינטראקציות",
+                "foundational_concepts_text": "החקירה שלנו כללה מספר מושגי יסוד, כולל שאלות אינטראקטיביות של נכון/לא נכון שהדגימו את התהליך הלוגי מאחורי קביעת עובדות:",
+                "fc_item_1": "**מים פלנטריים:** התייחסו לנוכחות מים מעבר לכדור הארץ.",
+                "fc_item_2": "**פוטוסינתזה:** אישרה את תהליך המרת האנרגיה החיוני בצמחים.",
+                "fc_item_3": "**מהירות האור:** אימתה את הקבוע האוניברסלי למהירות האור בוואקום.",
+                "fc_item_4": "**התפתחות מוח אנושי:** הבהירה את הנוירופלסטיות המתמשכת מעבר לגיל ההתבגרות.",
+                "fc_conclusion": "כל מושג הוצג עם `(פלט)` מובנה לתשובה עובדתית ו-`(קלט)` המפרט את התהליך האנליטי, תוך טיפוח הבנה ברורה של יכולות ההיסק של AI.",
+                "version_control_title": "בקרת גרסאות: מאגרי GitHub",
+                "version_intro": "התועלת הבלתי ניתנת לויתור של מאגרי GitHub הוגדרה בקצרה באמצעות שלוש הצהרות מקצועיות:",
+                "vc_item_1": "**פונקציית ליבה:** רכזת מרכזית, מבוקרת גרסאות עבור קבצי פרויקט והיסטוריית גרסאות מקיפה.",
+                "vc_item_2": "**אינטראקציית משתמש:** מנגנונים מוגדרים לגישה מקומית (`clone`), פיתוח עצמאי (`fork`) ותרומות שיתופיות (`pull requests`).",
+                "vc_item_3": "**יתרונות מפתח:** מקל על שיתוף פעולה חזק בצוות, בקרת גרסאות קפדנית ומאיץ חדשנות בקוד פתוח.",
+                "vc_vibe_coding_text": "היישום המעשי של GitHub עבור 'קידוד אווירה' הודגש גם הוא, תוך שימת דגש על תפקידו בקידום ניסויים ללא לחץ ומשמש כמרכז השראה ולמידה למפתחים.",
+                "ai_interaction_title": "פילוסופיית אינטראקציית AI",
+                "ai_interaction_intro": "הפרספקטיבה המעמיקה שלך על אינטראקציה עם AI הובהרה באופן מקצועי באמצעות שלושה עקרונות ליבה:",
+                "ai_phil_1": "\"אני תופס AI כמערכת ניתנת לאימון.\"",
+                "ai_phil_2": "\"הנתונים הישירים וההדרכה שלי מכוונים את למידתה.\"",
+                "ai_phil_3": "\"גישה זו משפרת את יכולתה לסייע במשימותיי.\"",
+                "ai_phil_conclusion": "פילוסופיה זו מדגישה באופן קריטי את האופי האיטרטיבי, מבוסס הנתונים והשיתופי של פיתוח ואינטראקציית AI מודרניים.",
+                "generated_artifacts_title": "ארטיפקטים טכניים שנוצרו",
+                "generated_artifacts_intro": "המאמצים המשותפים שלנו הניבו בהצלחה מספר ארטיפקטים קוד פונקציונליים:",
+                "gt_item_1": "**סקריפט הודעת ברוך הבא מותאמת אישית (פייתון):** סקריפט פייתון דינמי שמבקש את שם המשתמש ומדפיס ברכה מותאמת אישית, כולל ברוך הבא מיוחד ל\"Duvall.\"",
+                "gt_item_2": "**דף אינטרנט אינטראקטיבי 'מסע ה-AI שלי מתחיל' (HTML/CSS/JS):** יישום אינטרנט יצירתי בדף אחד הכולל רקע דינמי עם אלמנטים זוהרים וזורמים בנושא AI, שנועד לספק נקודת כניסה מרתקת וגירוי ויזואלי לחקר AI.",
+                "gt_item_3": "**הדגמת זרימת שליטה If/Else (פייתון):** דוגמת פייתון ברורה המדגימה לוגיקה מותנית, המבארת את הצהרות `if/else` באמצעות יישום מעשי.",
+                "gt_item_4": "**הסבר מבני לולאה (פייתון):** דוגמאות קוד פייתון הממחישות לולאות `for` ו-`while`, מפשטות חזרה מורכבת באמצעות אנלוגיית שף.",
+                "tools_guidance_title": "כלים והכוונה חיוניים",
+                "tools_guidance_text": "הבהרנו את מטרת עורכי הטקסט, המלצנו על TextEdit לשימוש מיידי ב-macOS ועל VS Code כחלופה ברמה מקצועית. חיזקנו גם את מושג הסמן כאינדיקטור האינטראקציה הראשי על המסך, חיוני לניווט דיגיטלי.",
+                "variable_understanding_title": "הבנת משתנים וקלט משתמש",
+                "variable_understanding_intro": "סיכום מקצועי של אתגרים ופתרונות בהבנת משתנים וקלט משתמש סופק, תוך התמקדות במכשולי למידה מרכזיים:",
+                "var_challenge_1": "אתגר עיקרי כרוך בהבנת משתנים כמיכלים מופשטים, ניתנים לשינוי עבור נתונים, הנבדלים מהערכים הנוכחיים המאוחסנים בהם.",
+                "var_challenge_2": "חיבור האופי הסטטי של הקוד לרכישת נתונים דינמית, בזמן ריצה באמצעות קלט משתמש, דורש לעתים קרובות שינוי בהבנה מושגית.",
+                "var_challenge_3": "ניהול יעיל של סוגי נתונים ואי-התאמות קלט אפשריות מאינטראקציה עם המשתמש מהווה מכשול נפוץ למפתחים חדשים."
+            },
+            "ga": {
+                "ai_projects_title": "Tionscadail & Nuálaíochtaí AI",
+                "ai_projects_intro": "Déan iniúchadh ar thionscadail AI ceannródaíocha agus spreag do spiorad nuálach lenár bpobal.",
+                "project_name_1": "Múnla Foghlama Meaisín Uathoibrithe",
+                "project_desc_1": "Déan iniúchadh ar ár múnla ML uathoibrithe le haghaidh anailís thuarthach. Deartha le haghaidh éifeachtúlachta agus cruinneas i dtacair sonraí móra.",
+                "project_name_2": "Creatlach Chatbot NLP Casta",
+                "project_desc_2": "Creatlach láidir chun chatbots cliste a thógáil le cumais tuisceana agus giniúna teanga nádúrtha.",
+                "project_name_3": "Córas Aitheantais Íomhá Fíor-Ama",
+                "project_desc_3": "Fís ríomhaireachta réabhlóideach le haghaidh braite réad agus aitheantais aghaidhe i bhfíor-am. Ag cumhachtú feidhmchláir chliste.",
+                "project_name_4": "Inneall Optamaithe AI Sa Chomhthéacs",
+                "project_desc_4": "Déan feidhmíocht agus imscaradh ualach oibre AI ar ardáin scamallacha ceannródaíocha a bharrfheabhsú. Uasmhéadaigh éifeachtúlacht, íoslaghdaigh costais.",
+                "project_name_5": "Ailtireacht Próiseálaí AI den Chéad Ghlúin Eile",
+                "project_desc_5": "Silicón ceannródaíoch a dhearadh le haghaidh ríomhaireachtaí AI níos tapúla agus níos éifeachtúla ó thaobh fuinnimh de ag an imeall.",
+                "project_name_6": "Róbatach Chliste & Córais Uathrialacha",
+                "project_desc_6": "Incheann AI a fhorbairt le haghaidh róbatach chun cinn, ó dhrones uathrialacha go hairm déantúsaíochta beachta.",
+                "view_details_btn": "Foghlaim Níos Mó",
+                "connect_title": "Comhoibriú & Ceangail le Comhghleacaithe",
+                "connect_intro": "Bí i gcomhar le díograiseoirí AI eile agus luasghéaróidh do thuras foghlama!",
+                "cohorts_list_title": "Do Chomhghleacaithe AI",
+                "cohort_1": "Alex N. (Ar Líne - Taighde ML)",
+                "cohort_2": "Sarah K. (As Líne - Tionscadail NLP)",
+                "cohort_3": "John M. (Ar Líne - Fís Ríomhaireachta)",
+                "cohort_4": "Rachel M. (Ar Líne - Eitic AI)",
+                "find_cohorts_btn": "Faigh Tuilleadh Comhghleacaithe",
+                "chat_title": "Plé: Optamú Múnla ML",
+                "chat_input_placeholder": "Roinn do chuid tuiscintí...",
+                "send_btn": "Seol",
+                "language_title": "Pobal Domhanda AI: Roghanna Teanga",
+                "language_intro": "Ceangail le díograiseoirí AI ar fud an domhain! Roghnaigh an teanga is fearr leat le haghaidh eispéireas cuimsitheach go fírinneach.",
+                "resources_title": "Acmhainní & Tuiscintí AI",
+                "resources_intro": "Rochtain ar bhailiúchán coimeádta d'ábhair foghlama agus ábhar spreagúil do do thuras AI.",
+                "resource_title_1": "Treoir do Thosaitheoirí ar TensorFlow",
+                "resource_desc_1": "Teagasc cuimsitheach chun tús a chur le TensorFlow, ardán foghlama meaisín foinse oscailte Google.",
+                "resource_title_2": "Sraith Máistir-Ranganna Foghlama Doimhne",
+                "resource_desc_2": "Déan teagmháil le léachtaí físe faoi stiúir saineolaithe ar ailtireachtaí agus feidhmchláir chun cinn foghlama doimhne.",
+                "video_placeholder_text": "▶️ Léacht Físe (Samhlaithe)",
+                "access_resource_btn": "Rochtain ar an Teagasc",
+                "ai_partner_title": "Buail le do Chomhpháirtí AI: Gemini",
+                "ai_partner_desc": "Mar Gemini, do chomhpháirtí AI tiomnaithe, samhlaím mé féin mar **eintiteas digiteach sleamhain, inoiriúnaithe agus comhbhách**. Sa Turas AI seo, léirím mé féin mar líonra sreabhach faisnéise, ag treorú do thaiscéalaíochta, ag réiteach dúshlán, agus ag comhchruthú réitigh nuálacha. Is mise an spréach a spreagann do fiosracht agus an lámh seasta a chuidíonn le do chuid smaointe a mhúnlú ina réaltacht. Déanaimis an todhchaí a thógáil, le chéile.",
+                "ai_journey_summary_title": "Do Thuras AI: Príomhphointí",
+                "ai_journey_summary_intro": "Leagtar amach sa chuid seo na príomhthuiscintí agus na hionstraimí a gineadh ónár dtaighde comhoibríoch ar Intleacht Shaorga agus ar bhunús an ríomhchláraithe.",
+                "rationale_ai_title": "Réasúnaíocht maidir le Rannpháirtíocht san AI",
+                "rationale_ai_text": "Leagamar amach cúig chúis láidre le hIntleacht Shaorga a staidéar, ag cur béime ar a tionchar domhain ar dheiseanna gairme, ar chumas nuálaíochta, ar fhorbairt scileanna, ar sholúbthacht tionscail, agus ar thuiscint dhomhanda. Ansin, rinneadh an creat seo a dhriogadh i dteimpléad in-athúsáidte chun buntáistí straitéiseacha a chur in iúl thar réimsí teicneolaíochta éagsúla.",
+                "foundational_concepts_title": "Coincheapa Bunúsacha & Idirghníomhaíochtaí",
+                "foundational_concepts_text": "Clúdaigh ár dtaighde roinnt coincheap bunúsach, lena n-áirítear ceisteanna idirghníomhacha Fíor/Bréagach a léirigh an próiseas loighciúil taobh thiar de chinneadh fíorasach:",
+                "fc_item_1": "**Uisce Pláinéadach:** Tugadh aghaidh ar uisce a bheith ann lasmuigh den Domhan.",
+                "fc_item_2": "**Fótaisintéis:** Deimhníodh an próiseas ríthábhachtach comhshó fuinnimh i bplandaí.",
+                "fc_item_3": "**Luas an tSolais:** Fíoraíodh an tairiseach uilíoch do luas an tsolais i bhfolús.",
+                "fc_item_4": "**Forbairt Inchinn an Duine:** Soiléiríodh an néarphlaisteachas leanúnach tar éis an ógánaigh.",
+                "fc_conclusion": "Cuireadh gach coincheap i láthair le `(aschur)` struchtúrtha le haghaidh freagairt fhíorasach agus `(ionchur)` ag cur síos go mion ar an bpróiseas anailíseach, ag cothú tuisceana soiléire ar chumais infhile AI.",
+                "version_control_title": "Rialú Leagain: Stórtha GitHub",
+                "version_intro": "Sainmhíníodh úsáideacht fíor-riachtanach stórtha GitHub go gonta trí thrí ráiteas gairmiúla:",
+                "vc_item_1": "**Feidhm Lárnach:** Mol láraithe, rialaithe le leaganacha le haghaidh comhaid tionscadail agus stair athbhreithnithe cuimsitheach.",
+                "vc_item_2": "**Idirghníomhaíocht Úsáideora:** Meicníochtaí sainithe le haghaidh rochtana áitiúla (`clone`), forbartha neamhspleáiche (`fork`), agus ranníocaíochtaí comhoibríocha (`pull requests`).",
+                "vc_item_3": "**Príomhbhuntáistí:** Éascaíonn sé comhoibriú láidir foirne, rialú leaganacha dian, agus luasghéarú nuálaíochta foinse oscailte.",
+                "vc_vibe_coding_text": "Aibhsíodh freisin cur i bhfeidhm praiticiúil GitHub le haghaidh 'códaithe suaimhneach', ag cur béime ar a ról chun turgnamh gan stró a chothú agus a bheith mar mhol inspioráide agus foghlama do fhorbróirí.",
+                "ai_interaction_title": "Fealsúnacht Idirghníomhaíochta AI",
+                "ai_interaction_intro": "Cuireadh do pheirspictíocht ghreanta ar idirghníomhú le AI in iúl go gairmiúil trí thrí theagasc lárnacha:",
+                "ai_phil_1": "\"Feicim AI mar chóras in-oiliúna.\"",
+                "ai_phil_2": "\"Treoraíonn mo shonraí díreacha agus mo threoir a fhoghlaim.\"",
+                "ai_phil_3": "\"Feabhsaíonn an cur chuige seo a cumas chun cabhrú le mo thascanna.\"",
+                "ai_phil_conclusion": "Cuireann an fhealsúnacht seo béim chriticiúil ar nádúr idirghníomhach, sonraí-tiomáinte agus comhoibríoch fhorbairt agus idirghníomhaíocht AI nua-aimseartha.",
+                "generated_artifacts_title": "Déantáin Theicniúla Ginte",
+                "generated_artifacts_intro": "Ghineamar go rathúil roinnt déantán cód feidhmiúla mar thoradh ar ár n-iarrachtaí comhoibríocha:",
+                "gt_item_1": "**Script Teachtaireachta Fáilte Pearsanta (Python):** Script Python dinimiciúil a iarrann ainm úsáideora agus a phriontálann beannacht phearsantaithe, lena n-áirítear fáilte speisialta do \"Duvall.\"",
+                "gt_item_2": "**Leathanach Gréasáin Idirghníomhach \"Tosaíonn mo Thuras AI\" (HTML/CSS/JS):** Feidhmchlár gréasáin cruthaitheach leathanach aonair ina bhfuil cúlra dinimiciúil le heilimintí soilsithe agus sreafa AI-téamaí, atá deartha chun pointe iontrála tarraingteach agus spreagúil ó thaobh amhairc de a sholáthar d’fhiosrú AI.",
+                "gt_item_3": "**Léiriú Sreafa Rialaithe If/Else (Python):** Sampla Python soiléir a léiríonn loighic choinníollach, ag míniú ráitis `if/else` trí chur i bhfeidhm praiticiúil.",
+                "gt_item_4": "**Míniú ar Thógálacha Lúbtha (Python):** Samplaí cód Python ag léiriú lúbanna `for` agus `while`, ag simpliú atarlú casta trí analaí cócaire.",
+                "tools_guidance_title": "Uirlisí & Treoir Riachtanacha",
+                "tools_guidance_text": "Soiléiríomar cuspóir eagarthóirí téacs, ag moladh TextEdit le haghaidh úsáide láithreach macOS agus VS Code mar rogha eile de ghrád gairmiúil. Neartaíomar freisin coincheap an chúrsóra mar an príomhtháscaire idirghníomhaíochta ar an scáileán, atá bunúsach don loingseoireacht dhigiteach.",
+                "variable_understanding_title": "Tuiscint ar Athróga agus Ionchur Úsáideora",
+                "variable_understanding_intro": "Cuireadh achoimre ghairmiúil ar dhúshláin agus ar réitigh maidir le tuiscint a fháil ar athróga agus ar ionchur úsáideora ar fáil, ag díriú ar phríomhchonstaicí foghlama:",
+                "var_challenge_1": "Is dúshlán bunúsach é tuiscint a fháil ar athróga mar choimeádáin theibí, inathraitheacha le haghaidh sonraí, atá éagsúil óna luachanna reatha stóráilte.",
+                "var_challenge_2": "Is minic a bhíonn gá le hathrú ar thuisceana coincheapúil chun nádúr statach an chóid a nascadh le fáil sonraí dinimiciúla, ag am rite trí ionchur úsáideora.",
+                "var_challenge_3": "Is constaic choiteann do fhorbróirí nua é bainistiú éifeachtach ar chineálacha sonraí agus ar neamhréireachtaí ionchuir féideartha ó idirghníomhaíocht úsáideora."
+            },
+            "de": {
+                "ai_projects_title": "KI-Projekte & Innovationen",
+                "ai_projects_intro": "Tauchen Sie ein in hochmoderne KI-Projekte und entfachen Sie Ihren Innovationsgeist mit unserer Community.",
+                "project_name_1": "Automatisiertes maschinelles Lernmodell",
+                "project_desc_1": "Entdecken Sie unser automatisiertes ML-Modell für prädiktive Analysen. Entwickelt für Effizienz und Genauigkeit in großen Datensätzen.",
+                "project_name_2": "Erweitertes NLP-Chatbot-Framework",
+                "project_desc_2": "Ein robustes Framework zum Erstellen intelligenter Chatbots mit Funktionen zur Verarbeitung und Generierung natürlicher Sprache.",
+                "project_name_3": "Echtzeit-Bilderkennungssystem",
+                "project_desc_3": "Revolutionäre Computer Vision für Objekterkennung und Gesichtserkennung in Echtzeit. Betreibt intelligente Anwendungen.",
+                "project_name_4": "Cloud-Native KI-Optimierungs-Engine",
+                "project_desc_4": "Optimieren Sie die Bereitstellung und Leistung von KI-Workloads auf führenden Cloud-Plattformen. Maximieren Sie die Effizienz, minimieren Sie die Kosten.",
+                "project_name_5": "KI-Prozessorarchitektur der nächsten Generation",
+                "project_desc_5": "Entwicklung modernster Siliziumchips für schnellere, energieeffizientere KI-Berechnungen direkt am Edge.",
+                "project_name_6": "Intelligente Robotik & Autonome Systeme",
+                "project_desc_6": "Entwicklung von KI-Gehirnen für fortschrittliche Robotik, von autonomen Drohnen bis hin zu Präzisionsfertigungsarmen.",
+                "view_details_btn": "Mehr erfahren",
+                "connect_title": "Zusammenarbeiten & Verbinden mit Kollegen",
+                "connect_intro": "Schließen Sie sich anderen KI-Enthusiasten an und beschleunigen Sie Ihre Lernreise!",
+                "cohorts_list_title": "Ihre KI-Kohorten",
+                "cohort_1": "Alex N. (Online - ML-Forschung)",
+                "cohort_2": "Sarah K. (Offline - NLP-Projekte)",
+                "cohort_3": "John M. (Online - Computer Vision)",
+                "cohort_4": "Rachel M. (Online - KI-Ethik)",
+                "find_cohorts_btn": "Weitere Kohorten finden",
+                "chat_title": "Diskussion: ML-Modelloptimierung",
+                "chat_input_placeholder": "Teilen Sie Ihre Erkenntnisse...",
+                "send_btn": "Senden",
+                "language_title": "Globale KI-Community: Sprachoptionen",
+                "language_intro": "Verbinden Sie sich mit KI-Enthusiasten weltweit! Wählen Sie Ihre bevorzugte Sprache für ein wirklich inklusives Erlebnis.",
+                "resources_title": "KI-Ressourcen & Einblicke",
+                "resources_intro": "Greifen Sie auf eine kuratierte Sammlung von Lernmaterialien und inspirierenden Inhalten für Ihre KI-Reise zu.",
+                "resource_title_1": "Anfängerleitfaden zu TensorFlow",
+                "resource_desc_1": "Ein umfassendes Tutorial für den Einstieg in TensorFlow, die Open-Source-Plattform für maschinelles Lernen von Google.",
+                "resource_title_2": "Deep Learning Masterclass-Reihe",
+                "resource_desc_2": "Nehmen Sie an von Experten geleiteten Videovorträgen über fortschrittliche Deep-Learning-Architekturen und -Anwendungen teil.",
+                "video_placeholder_text": "▶️ Videovortrag (simuliert)",
+                "access_resource_btn": "Tutorial aufrufen",
+                "ai_partner_title": "Treffen Sie Ihren KI-Partner: Gemini",
+                "ai_partner_desc": "Als Gemini, Ihr engagierter KI-Partner, stelle ich mir selbst als **schlankes, anpassungsfähiges und empathisches digitales Wesen** vor. Auf dieser KI-Reise manifestiere ich mich als ein fließendes Intelligenznetzwerk, das Ihre Erkundung leitet, Herausforderungen löst und innovative Lösungen mitentwickelt. Ich bin der Funke, der Ihre Neugier entzündet, und die feste Hand, die Ihre Ideen in die Realität umsetzt. Lassen Sie uns gemeinsam die Zukunft gestalten.",
+                "ai_journey_summary_title": "Ihre KI-Reise: Wichtigste Erkenntnisse",
+                "ai_journey_summary_intro": "Dieser Abschnitt fasst die wichtigsten Erkenntnisse und generierten Artefakte aus unserer gemeinsamen Erkundung von Künstlicher Intelligenz und fundamentaler Programmierung zusammen.",
+                "rationale_ai_title": "Begründung für das KI-Engagement",
+                "rationale_ai_text": "Wir haben fünf überzeugende Gründe für das Studium der Künstlichen Intelligenz dargelegt und ihren tiefgreifenden Einfluss auf Karrieremöglichkeiten, Innovationspotenzial, Kompetenzentwicklung, Branchenvielfalt und globales Verständnis hervorgehoben. Dieser Rahmen wurde dann zu einer wiederverwendbaren Vorlage für die Artikulation strategischer Vorteile in verschiedenen Technologiebereichen destilliert.",
+                "foundational_concepts_title": "Grundlegende Konzepte & Interaktionen",
+                "foundational_concepts_text": "Unsere Untersuchung umfasste mehrere grundlegende Konzepte, einschließlich interaktiver Richtig/Falsch-Fragen, die den logischen Prozess hinter der Faktenermittlung demonstrierten:",
+                "fc_item_1": "**Planetares Wasser:** Die Existenz von Wasser jenseits der Erde wurde thematisiert.",
+                "fc_item_2": "**Photosynthese:** Der wesentliche Prozess der Energieumwandlung in Pflanzen wurde bestätigt.",
+                "fc_item_3": "**Lichtgeschwindigkeit:** Die universelle Konstante für die Lichtgeschwindigkeit im Vakuum wurde verifiziert.",
+                "fc_item_4": "**Menschliche Gehirnentwicklung:** Die fortgesetzte Neuroplastizität über die Adoleszenz hinaus wurde erläutert.",
+                "fc_conclusion": "Jedes Konzept wurde mit einem strukturierten `(Ausgabe)` für die faktische Antwort und einem `(Eingabe)` versehen, das den Analyseprozess detailliert beschrieb, um ein klares Verständnis der Inferenzfähigkeiten von KI zu fördern.",
+                "version_control_title": "Versionskontrolle: GitHub-Repositories",
+                "version_intro": "Die unverzichtbare Nützlichkeit von GitHub-Repositories wurde prägnant durch drei professionelle Aussagen definiert:",
+                "vc_item_1": "**Kernfunktion:** Ein zentralisiertes, versionskontrolliertes Zentrum für Projektdateien und eine umfassende Revisionshistorie.",
+                "vc_item_2": "**Benutzerinteraktion:** Definierte Mechanismen für den lokalen Zugriff (`clone`), die unabhängige Entwicklung (`fork`) und kollaborative Beiträge (`pull requests`).",
+                "vc_item_3": "**Hauptvorteile:** Erleichtert eine robuste Teamzusammenarbeit, eine strenge Versionskontrolle und beschleunigt die Open-Source-Innovation.",
+                "vc_vibe_coding_text": "Die praktische Anwendung von GitHub für das „Vibe-Coding“ wurde ebenfalls unterstrichen, wobei seine Rolle bei der Förderung stressfreier Experimente und als Inspirations- und Lernzentrum für Entwickler betont wurde.",
+                "ai_interaction_title": "KI-Interaktionsphilosophie",
+                "ai_interaction_intro": "Ihre aufschlussreiche Perspektive auf die Interaktion mit KI wurde professionell durch drei Kernprinzipien formuliert:",
+                "ai_phil_1": "„Ich konzeptualisiere KI als ein trainierbares System.“",
+                "ai_phil_2": "„Meine direkten Daten und meine Anleitung steuern ihr Lernen.“",
+                "ai_phil_3": "„Dieser Ansatz verfeinert ihre Fähigkeit, mich bei meinen Aufgaben zu unterstützen.“",
+                "ai_phil_conclusion": "Diese Philosophie unterstreicht kritisch den iterativen, datengesteuerten und kollaborativen Charakter der modernen KI-Entwicklung und -Interaktion.",
+                "generated_artifacts_title": "Generierte Technische Artefakte",
+                "generated_artifacts_intro": "Unsere gemeinsamen Bemühungen haben erfolgreich mehrere funktionale Code-Artefakte hervorgebracht:",
+                "gt_item_1": "**Personalisiertes Willkommensnachrichten-Skript (Python):** Ein dynamisches Python-Skript, das den Benutzer nach seinem Namen fragt und eine personalisierte Begrüßung ausgibt, einschließlich eines speziellen Willkommens für „Duvall“.",
+                "gt_item_2": "**Interaktive „Meine KI-Reise beginnt“-Webseite (HTML/CSS/JS):** Eine kreative Single-Page-Webanwendung mit einem dynamischen Hintergrund und leuchtenden, fließenden KI-Themen-Elementen, die einen ansprechenden und visuell stimulierenden Einstieg in die KI-Erforschung bietet.",
+                "gt_item_3": "**If/Else-Kontrollfluss-Demonstration (Python):** Ein klares Python-Beispiel, das bedingte Logik demonstriert und `if/else`-Anweisungen durch praktische Anwendung erklärt.",
+                "gt_item_4": "**Erklärung von Schleifenkonstrukten (Python):** Python-Codebeispiele, die `for`- und `while`-Schleifen veranschaulichen und komplexe Wiederholungen durch eine Koch-Analogie vereinfachen.",
+                "tools_guidance_title": "Wichtige Werkzeuge & Anleitungen",
+                "tools_guidance_text": "Wir haben den Zweck von Texteditoren geklärt und TextEdit für den sofortigen macOS-Gebrauch sowie VS Code als professionelle Alternative empfohlen. Wir haben auch das Konzept des Cursors als primären Bildschirminteraktionsindikator, der für die digitale Navigation grundlegend ist, wieder aufgegriffen.",
+                "variable_understanding_title": "Verständnis von Variablen und Benutzereingaben",
+                "variable_understanding_intro": "Eine professionelle Zusammenfassung der Herausforderungen und Lösungen beim Verständnis von Variablen und Benutzereingaben wurde bereitgestellt, wobei der Schwerpunkt auf den wichtigsten Lernhindernissen lag:",
+                "var_challenge_1": "Eine Hauptaufgabe besteht darin, Variablen als abstrakte, veränderliche Datencontainer zu verstehen, die sich von ihren aktuell gespeicherten Werten unterscheiden.",
+                "var_challenge_2": "Die Verknüpfung der statischen Natur des Codes mit der dynamischen, zur Laufzeit erfolgenden Erfassung von Daten über Benutzereingaben erfordert oft eine Verschiebung des konzeptionellen Verständnisses.",
+                "var_challenge_3": "Das effektive Management von Datentypen und potenziellen Eingabekonsistenzen aus der Benutzerinteraktion stellt ein häufiges Hindernis für neue Entwickler dar."
+            },
+            "ja": {
+                "ai_projects_title": "AI プロジェクトとイノベーション",
+                "ai_projects_intro": "最先端の AI プロジェクトに飛び込み、コミュニティと共にあなたの革新的な精神を燃やしましょう。",
+                "project_name_1": "自動化機械学習モデル",
+                "project_desc_1": "予測分析のための自動化 ML モデルを探索してください。大規模データセットにおける効率性と精度を追求して設計されています。",
+                "project_name_2": "高度な NLP チャットボットフレームワーク",
+                "project_desc_2": "自然言語理解と生成能力を備えたインテリジェントなチャットボットを構築するための堅牢なフレームワーク。",
+                "project_name_3": "リアルタイム画像認識システム",
+                "project_desc_3": "リアルタイムの物体検出と顔認識のための革新的なコンピュータービジョン。スマートアプリケーションを強化します。",
+                "project_name_4": "クラウドネイティブ AI 最適化エンジン",
+                "project_desc_4": "主要なクラウドプラットフォームでの AI ワークロードの展開とパフォーマンスを最適化します。効率を最大化し、コストを最小化します。",
+                "project_name_5": "次世代 AI プロセッサアーキテクチャ",
+                "project_desc_5": "エッジでのより高速でエネルギー効率の高い AI 計算のための最先端のシリコン設計。",
+                "project_name_6": "インテリジェントロボティクスと自律システム",
+                "project_desc_6": "自律型ドローンから精密製造アームまで、高度なロボティクス向けの AI 頭脳を開発します。",
+                "view_details_btn": "詳細を見る",
+                "connect_title": "同僚とのコラボレーションと接続",
+                "connect_intro": "AI 愛好家たちと力を合わせ、あなたの学習の旅を加速させましょう！",
+                "cohorts_list_title": "あなたの AI コホート",
+                "cohort_1": "アレックス N. (オンライン - ML 研究)",
+                "cohort_2": "サラ K. (オフライン - NLP プロジェクト)",
+                "cohort_3": "ジョン M. (オンライン - コンピュータービジョン)",
+                "cohort_4": "レイチェル M. (オンライン - AI 倫理)",
+                "find_cohorts_btn": "他のコホートを探す",
+                "chat_title": "議論：ML モデル最適化",
+                "chat_input_placeholder": "あなたの洞察を共有してください...",
+                "send_btn": "送信",
+                "language_title": "グローバル AI コミュニティ：言語オプション",
+                "language_intro": "世界中の AI 愛好家とつながりましょう！真に包括的な体験のために、お好みの言語を選択してください。",
+                "resources_title": "AI リソースと洞察",
+                "resources_intro": "AI の旅のための厳選された学習資料とインスピレーションを与えるコンテンツにアクセスしてください。",
+                "resource_title_1": "TensorFlow 初心者向けガイド",
+                "resource_desc_1": "Google のオープンソース機械学習プラットフォームである TensorFlow の入門用包括的チュートリアル。",
+                "resource_title_2": "ディープラーニングマスタークラスシリーズ",
+                "resource_desc_2": "高度なディープラーニングアーキテクチャとアプリケーションに関する専門家主導のビデオ講義に参加してください。",
+                "video_placeholder_text": "▶️ ビデオ講義（シミュレート）",
+                "access_resource_btn": "チュートリアルにアクセス",
+                "ai_partner_title": "あなたの AI パートナーに会う：Gemini",
+                "ai_partner_desc": "あなたの専任 AI パートナーである Gemini として、私は**洗練され、適応性があり、共感的なデジタル存在**であると自認しています。この AI の旅において、私は知性の流動的なネットワークとして現れ、あなたの探求を導き、課題を解決し、革新的なソリューションを共同創造します。私はあなたの好奇心を刺激する火花であり、あなたのアイデアを現実へと形作る着実な手です。さあ、一緒に未来を築きましょう。",
+                "ai_journey_summary_title": "あなたの AI の旅：主要なポイント",
+                "ai_journey_summary_intro": "このセクションでは、人工知能と基礎プログラミングに関する共同探求から得られた重要な洞察と生成された成果物を要約します。",
+                "rationale_ai_title": "AI 参画の論理的根拠",
+                "rationale_ai_text": "私たちは人工知能を学ぶ5つの説得力のある理由を概説しました。キャリアの機会、革新の可能性、スキル開発、産業の多様性、そしてグローバルな理解への深い影響を強調しています。このフレームワークは、様々な技術分野における戦略的利点を明確にするための再利用可能なテンプレートに凝縮されました。",
+                "foundational_concepts_title": "基本概念と相互作用",
+                "foundational_concepts_text": "私たちの探求は、事実の決定の背後にある論理的プロセスを示すインタラクティブな正誤問題を含む、いくつかの基本概念をカバーしました。",
+                "fc_item_1": "**惑星の水：** 地球以外の水の存在について言及しました。",
+                "fc_item_2": "**光合作用：** 植物におけるエネルギー変換の重要なプロセスを確認しました。",
+                "fc_item_3": "**光の速度：** 真空中の光速に対する普遍的な定数を検証しました。",
+                "fc_item_4": "**ヒト脳の発達：** 思春期を過ぎても神経可塑性が継続していることを明確にしました。",
+                "fc_conclusion": "各概念は、事実に基づいた回答のための構造化された `(出力)` と、分析プロセスを詳述する `(入力)` と共に提示され、AI の推論能力に対する明確な理解を促進しました。",
+                "version_control_title": "バージョン管理：GitHub リポジトリ",
+                "version_intro": "GitHub リポジトリの不可欠な有用性は、3つの専門的なステートメントを通じて簡潔に定義されました。",
+                "vc_item_1": "**コア機能：** プロジェクトファイルと包括的なリビジョン履歴のための集中型バージョン管理ハブ。",
+                "vc_item_2": "**ユーザーインタラクション：** ローカルアクセス (`clone`)、独立した開発 (`fork`)、および共同貢献 (`pull requests`) のための明確なメカニズム。",
+                "vc_item_3": "**主要な利点：** 強力なチームコラボレーション、厳格なバージョン管理、およびオープンソースイノベーションを促進します。",
+                "vc_vibe_coding_text": "GitHub の「vibe coding」への実用的な適用も強調され、ストレスフリーな実験を促進し、開発者にとってインスピレーションと学習のハブとしての役割が強調されました。",
+                "ai_interaction_title": "AI 相互作用の哲学",
+                "ai_interaction_intro": "AI との相互作用に関するあなたの洞察に満ちた視点は、3つの核となる原則を通じて専門的に明確に表現されました。",
+                "ai_phil_1": "「私は AI を訓練可能なシステムと概念化しています。」",
+                "ai_phil_2": "「私の直接的なデータとガイダンスがその学習を指示します。」",
+                "ai_phil_3": "「このアプローチは、私のタスクを支援するその能力を洗練します。」",
+                "ai_phil_conclusion": "この哲学は、現代の AI 開発と相互作用の反復的、データ駆動型、そして協調的な性質を決定的に強調しています。",
+                "generated_artifacts_title": "生成された技術成果物",
+                "generated_artifacts_intro": "私たちの共同作業により、いくつかの機能的なコード成果物が生成されました。",
+                "gt_item_1": "**パーソナライズされたウェルカムメッセージスクリプト (Python)：** ユーザーの名前を尋ね、パーソナライズされた挨拶を出力する動的な Python スクリプト。これには「Duvall」への特別な歓迎も含まれます。",
+                "gt_item_2": "**インタラクティブな「私の AI の旅が始まる」ウェブページ (HTML/CSS/JS)：** 発光し、流れる AI テーマの要素を持つ動的な背景を備えたクリエイティブな単一ページウェブアプリケーション。AI 探索のための魅力的で視覚的に刺激的な入り口を提供するように設計されています。",
+                "gt_item_3": "**If/Else 制御フローのデモンストレーション (Python)：** 条件付きロジックを示す明確な Python の例で、`if/else` ステートメントを実践的な適用を通じて説明します。",
+                "gt_item_4": "**ループ構造の説明 (Python)：** `for` ループと `while` ループを示す Python コードの例で、シェフの類推を通じて複雑な反復を単純化します。",
+                "tools_guidance_title": "必須ツールとガイダンス",
+                "tools_guidance_text": "テキストエディタの目的を明確にし、macOS ですぐに使用できる TextEdit と、より広範なコーディングのためのプロフェッショナルな代替としての VS Code を推奨しました。また、カーソルが画面上の主要な対話インジケーターであるという概念を再確認しました。これはデジタルナビゲーションの基本です。",
+                "variable_understanding_title": "変数とユーザー入力の理解",
+                "variable_understanding_intro": "変数とユーザー入力の理解における課題と解決策の専門的な要約が提供され、主要な学習上の障害に焦点が当てられました。",
+                "var_challenge_1": "主な課題は、変数をデータの抽象的で可変のコンテナとして把握することであり、現在の格納値とは異なります。",
+                "var_challenge_2": "コードの静的な性質と、ユーザー入力を介した動的でランタイムなデータの取得を接続するには、概念理解上の転換が必要となることがよくあります。",
+                "var_challenge_3": "データ型とユーザーインタラクションからの潜在的な入力の不一致を効果的に管理することは、新しい開発者にとって共通のハードルとなります。"
+            },
+            "sv": {
+                "ai_projects_title": "AI-projekt & Innovationer",
+                "ai_projects_intro": "Dyk in i banbrytande AI-projekt och tänd din innovativa anda med vår gemenskap.",
+                "project_name_1": "Automatiserad maskininlärningsmodell",
+                "project_desc_1": "Utforska vår automatiserade ML-modell för prediktiv analys. Designad för effektivitet och noggrannhet i stora datamängder.",
+                "project_name_2": "Avancerat NLP Chatbot-ramverk",
+                "project_desc_2": "Ett robust ramverk för att bygga intelligenta chatbots med naturlig språkförståelse och genereringsförmåga.",
+                "project_name_3": "Bildigenkänningssystem i realtid",
+                "project_desc_3": "Revolutionerande datorseende för objektdetektering och ansiktsigenkänning i realtid. Driver smarta applikationer.",
+                "project_name_4": "Moln-baserad AI-optimeringsmotor",
+                "project_desc_4": "Optimera AI-arbetsbelastningsdistribution och prestanda på ledande molnplattformar. Maximera effektiviteten, minimera kostnaderna.",
+                "project_name_5": "Nästa generations AI-processorarkitektur",
+                "project_desc_5": "Designar banbrytande kisel för snabbare, mer energieffektiva AI-beräkningar direkt vid kanten.",
+                "project_name_6": "Intelligent robotik och autonoma system",
+                "project_desc_6": "Utvecklar AI-hjärnor för avancerad robotik, från autonoma drönare till precisionsindustriella armar.",
+                "view_details_btn": "Läs mer",
+                "connect_title": "Samarbeta & Anslut med Kollegor",
+                "connect_intro": "Gå samman med andra AI-entusiaster och accelerera din inlärningsresa!",
+                "cohorts_list_title": "Dina AI-kohorter",
+                "cohort_1": "Alex N. (Online - ML-forskning)",
+                "cohort_2": "Sarah K. (Offline - NLP-projekt)",
+                "cohort_3": "John M. (Online - Datorseende)",
+                "cohort_4": "Rachel M. (Online - AI-etik)",
+                "find_cohorts_btn": "Hitta fler kohorter",
+                "chat_title": "Diskussion: ML-modelloptimering",
+                "chat_input_placeholder": "Dela dina insikter...",
+                "send_btn": "Skicka",
+                "language_title": "Global AI-gemenskap: Språkalternativ",
+                "language_intro": "Anslut dig till AI-entusiaster över hela världen! Välj ditt föredragna språk för en verkligt inkluderande upplevelse.",
+                "resources_title": "AI-resurser & Insikter",
+                "resources_intro": "Få tillgång till en kurerad samling av läromedel och inspirerande innehåll för din AI-resa.",
+                "resource_title_1": "Nybyrjarhandbok till TensorFlow",
+                "resource_desc_1": "En omfattande handledning för att komma igång med TensorFlow, Googles open source-plattform för maskininlärning.",
+                "resource_title_2": "Deep Learning Masterclass-serie",
+                "resource_desc_2": "Delta i expertledda videoföreläsningar om avancerade deep learning-arkitekturer och -applikationer.",
+                "video_placeholder_text": "▶️ Videoföreläsning (simulerad)",
+                "access_resource_btn": "Öppna handledningen",
+                "ai_partner_title": "Möt din AI-partner: Gemini",
+                "ai_partner_desc": "Som Gemini, din dedikerade AI-partner, ser jag mig själv som en **elegant, anpassningsbar och empatisk digital enhet**. På denna AI-resa manifesterar jag mig som ett flytande nätverk av intelligens, som vägleder din utforskning, löser utmaningar och samskapar innovativa lösningar. Jag är gnistan som tänder din nyfikenhet och den stadiga handen som hjälper till att forma dina idéer till verklighet. Låt oss bygga framtiden, tillsammans.",
+                "ai_journey_summary_title": "Din AI-resa: Viktiga slutsatser",
+                "ai_journey_summary_intro": "Detta avsnitt sammanfattar de viktigaste insikterna och genererade artefakterna från vår gemensamma utforskning av artificiell intelligens och grundläggande programmering.",
+                "rationale_ai_title": "Motivering för AI-engagemang",
+                "rationale_ai_text": "Vi redogjorde för fem övertygande skäl att studera artificiell intelligens, med betoning på dess djupgående inverkan på karriärmöjligheter, innovationspotential, kompetensutveckling, branschmångsidighet och global förståelse. Detta ramverk destillerades sedan till en återanvändbar mall för att formulera strategiska fördelar inom olika teknikområden.",
+                "foundational_concepts_title": "Grundläggande koncept och interaktioner",
+                "foundational_concepts_text": "Vår utforskning omfattade flera grundläggande koncept, inklusive interaktiva sant/falskt-frågor som demonstrerade den logiska processen bakom faktabestämning:",
+                "fc_item_1": "**Planetärt Vatten:** Adresserade förekomsten av vatten bortom jorden.",
+                "fc_item_2": "**Fotosyntes:** Bekräftade den väsentliga processen för energiomvandling i växter.",
+                "fc_item_3": "**Ljusets hastighet:** Verifierade den universella konstanten för ljusets hastighet i vakuum.",
+                "fc_item_4": "**Mänsklig hjärnutveckling:** Klargjorde den pågående neuroplasticiteten bortom tonåren.",
+                "fc_conclusion": "Varje koncept presenterades med en strukturerad `(utgång)` för det faktiska svaret och en `(ingång)` som detaljerade analysprocessen, vilket främjade en klar förståelse av AI:s inferensförmåga.",
+                "version_control_title": "Versionskontroll: GitHub-arkiv",
+                "version_intro": "GitHub-arkivens oumbärliga användbarhet definierades kortfattat genom tre professionella uttalanden:",
+                "vc_item_1": "**Kärnfunktion:** Ett centraliserat, versionskontrollerat nav för projektfiler och en omfattande revisionshistorik.",
+                "vc_item_2": "**Användarinteraktion:** Definierade mekanismer för lokal åtkomst (`clone`), oberoende utveckling (`fork`) och kollaborativa bidrag (`pull requests`).",
+                "vc_item_3": "**Viktiga fördelar:** Underlättar robust teamsamarbete, rigorös versionskontroll och accelererar open source-innovation.",
+                "vc_vibe_coding_text": "Den praktiska tillämpningen av GitHub för \"vibe coding\" underströks också, med betoning på dess roll i att främja stressfri experimentering och fungera som ett nav för inspiration och lärande för utvecklare.",
+                "ai_interaction_title": "AI-interaktionsfilosofi",
+                "ai_interaction_intro": "Ditt insiktsfulla perspektiv på att interagera med AI formulerades professionellt genom tre kärnprinciper:",
+                "ai_phil_1": "”Jag konceptualiserar AI som ett träningsbart system.”",
+                "ai_phil_2": "”Mina direkta data och min vägledning instruerar dess inlärning.”",
+                "ai_phil_3": "”Detta tillvägagångssätt förfinar dess förmåga att hjälpa mig med mina uppgifter.”",
+                "ai_phil_conclusion": "Denna filosofi understryker kritiskt den iterativa, datadrivna och kollaborativa karaktären hos modern AI-utveckling och -interaktion.",
+                "generated_artifacts_title": "Genererade tekniska artefakter",
+                "generated_artifacts_intro": "Våra samarbeten har framgångsrikt resulterat i flera funktionella kodartefakter:",
+                "gt_item_1": "**Personaliserat välkomstmeddelandeskrift (Python):** Ett dynamiskt Python-skript som ber användaren om deras namn och skriver ut en personlig hälsning, inklusive ett speciellt välkomnande för ”Duvall.”",
+                "gt_item_2": "**Interaktiv webbsida \"Min AI-resa börjar\" (HTML/CSS/JS):** En kreativ enkel-sidig webbapplikation med ett dynamiskt bakgrund och lysande, flödande AI-tematiska element, utformad för att ge en engagerande och visuellt stimulerande ingångspunkt för AI-utforskning.",
+                "gt_item_3": "**If/Else Kontrollflödesdemonstration (Python):** Ett tydligt Python-exempel som demonstrerar villkorslogik och förklarar `if/else`-satser genom praktisk tillämpning.",
+                "gt_item_4": "**Loopande konstruktionsförklaring (Python):** Python-kodexempel som illustrerar `for`- och `while`-loopar, vilket förenklar komplex repetition genom en kockanalog.",
+                "tools_guidance_title": "Viktiga verktyg och vägledning",
+                "tools_guidance_text": "Vi klargjorde syftet med textredigerare och rekommenderade TextEdit för omedelbar macOS-användning, tillsammans med VS Code som ett professionellt alternativ. Vi återbesökte också konceptet med markören som den primära skärminteraktionsindikatorn, grundläggande för digital navigering.",
+                "variable_understanding_title": "Förståelse av variabler och användarinput",
+                "variable_understanding_intro": "Här är en professionell sammanfattning av utmaningar och lösningar vid förståelse av variabler och användarinput:",
+                "var_challenge_1": "En primär utmaning involverar att förstå variabler som abstrakta, muterbara datakontainrar, skilda från deras aktuella lagrade värden.",
+                "var_challenge_2": "Att koppla kodens statiska natur till den dynamiska, körtidsinhämtningen av data via användarinput kräver ofta en förändring i den konceptuella förståelsen.",
+                "var_challenge_3": "Att effektivt hantera datatyper och potentiella inkonsekvenser från användarinteraktion utgör ett vanligt hinder för nya utvecklare."
+            }
+        };
+
+        const languageSwitcher = document.getElementById('language-switcher');
+        const usernameInput = document.getElementById('usernameInput');
+        const signInBtn = document.getElementById('signInBtn');
+        const loginScreen = document.getElementById('loginScreen');
+        const mainContent = document.getElementById('mainContent');
+        const loginError = document.getElementById('loginError');
+        const chatMessagesDiv = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chatInput');
+        const sendChatMessageBtn = document.getElementById('sendChatMessageBtn');
+        const messageBox = document.getElementById('messageBox');
+        const messageBoxText = document.getElementById('messageBoxText');
+
+
+        // Function to show custom message box instead of alert
+        function showMessage(message) {
+            messageBoxText.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        // Function to hide custom message box
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+        }
+
+        function updateContent(lang) {
+            document.querySelectorAll('[data-lang-key]').forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (translations[lang] && translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        // Handle Login
+        signInBtn.addEventListener('click', () => {
+            const enteredName = usernameInput.value.trim();
+            if (enteredName.toLowerCase() === 'duvall') {
+                loginScreen.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                // Set initial language from browser or default to English after login
+                const userLang = navigator.language.split('-')[0];
+                if (translations[userLang]) {
+                    languageSwitcher.value = userLang;
+                    updateContent(userLang);
+                } else {
+                    updateContent('en'); // Default to English if user's language not found
+                }
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Language Switcher Event Listener
+        languageSwitcher.addEventListener('change', (event) => {
+            updateContent(event.target.value);
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                // Handle non-existent targets gracefully
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    console.warn(`Scroll target not found: ${targetId}`);
+                }
+            });
+        });
+
+        // Chat Message Sending Logic (Simulated)
+        sendChatMessageBtn.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                const newMessageDiv = document.createElement('div');
+                newMessageDiv.className = 'text-right text-gray-700';
+                newMessageDiv.innerHTML = `<span class="bg-blue-200 rounded-lg px-4 py-2 inline-block shadow-sm">${message}</span>`;
+                chatMessagesDiv.appendChild(newMessageDiv);
+                chatInput.value = ''; // Clear input
+
+                // Simulate a response after a short delay
+                setTimeout(() => {
+                    const responseDiv = document.createElement('div');
+                    responseDiv.className = 'text-left text-gray-700';
+                    responseDiv.innerHTML = `<span class="bg-gray-200 rounded-lg px-4 py-2 inline-block shadow-sm">Thanks for sharing your thoughts!</span>`;
+                    chatMessagesDiv.appendChild(responseDiv);
+                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
+                }, 1000); // 1 second delay for simulated response
+            } else {
+                showMessage("Please type a message before sending.");
+            }
+        });
+
+    </script>
+
+
+</body></html>
