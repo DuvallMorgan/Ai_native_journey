@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USA Multilingual Learning Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 1000px; /* Wider container */
+            text-align: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 30px;
+            min-height: 80vh;
+        }
+        .learning-section, .chat-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        /* Language Selection Buttons (similar to previous alphabet app) */
+        .language-buttons button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 10px 18px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            min-width: 90px;
+        }
+        .language-buttons button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        .language-buttons button.active {
+            background-color: #007bff; /* Blue for active */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .language-buttons button:active {
+            transform: translateY(0);
+        }
+
+        /* Alphabet/Character Display */
+        .alphabet-display {
+            background-color: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #cbd5e1;
+            position: relative; /* For the speak button positioning */
+        }
+        .display-char {
+            font-size: 6rem; /* Slightly smaller to fit more content */
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .display-word {
+            font-size: 1.8rem;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+        .alphabet-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .nav-buttons button {
+            background-color: #60a5fa;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .nav-buttons button:hover {
+            background-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        .nav-buttons button:active {
+            transform: translateY(0);
+        }
+
+        /* Speak button for alphabet section */
+        .alphabet-speak-button {
+            background-color: #60a5fa;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .alphabet-speak-button:hover {
+            background-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        /* Writing Canvas */
+        canvas {
+            border: 2px solid #cbd5e1;
+            border-radius: 15px;
+            background-color: #f8fafc;
+            cursor: crosshair;
+            touch-action: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            width: 100%; /* Make canvas responsive */
+            max-width: 450px; /* Max width for canvas */
+            height: 150px; /* Fixed height for consistency */
+            margin: 10px auto;
+            display: block; /* Center the canvas */
+        }
+        .clear-canvas-button {
+            background-color: #ef4444 !important;
+            margin-top: 10px;
+        }
+        .clear-canvas-button:hover {
+            background-color: #dc2626 !important;
+        }
+
+        /* Chat Window (from previous AI tutor) */
+        .chat-window {
+            height: 450px; /* Slightly taller chat window */
+            background-color: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid #cbd5e1;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: #dbeafe;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .ai-message {
+            background-color: #e0f7fa;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .message-speaker {
+            margin-left: 10px;
+            cursor: pointer;
+            color: #3b82f6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .message-speaker:hover {
+            color: #1d4ed8;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex-grow: 1;
+            padding: 12px 18px;
+            border-radius: 15px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .input-area input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .input-area button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .input-area button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        .input-area button:active {
+            transform: translateY(0);
+        }
+        .loading-indicator {
+            text-align: center;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        /* Conceptual K-12 section */
+        .k12-concept {
+            background-color: #e0e7ff; /* Lighter blue for concept box */
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px dashed #93c5fd;
+        }
+        .k12-concept h3 {
+            font-weight: bold;
+            color: #4338ca; /* Darker blue */
+            margin-bottom: 10px;
+        }
+        .k12-concept ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            color: #4f46e5;
+        }
+
+        /* Image Display Modal */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .image-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .image-modal-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 70vh; /* Limit image height */
+            border-radius: 10px;
+            object-fit: contain;
+        }
+        .image-modal-content button {
+            background-color: #ef4444; /* Red for close */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .image-modal-content button:hover {
+            background-color: #dc2626;
+        }
+        .image-loading-text {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr; /* Single column on smaller screens */
+                gap: 20px;
+                min-height: auto;
+            }
+            .chat-section {
+                order: 2; /* Chat below alphabet */
+            }
+            .learning-section {
+                order: 1; /* Alphabet above chat */
+            }
+            .language-buttons {
+                flex-direction: column; /* Stack buttons on small screens */
+                gap: 10px;
+            }
+            .language-buttons button {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                min-width: unset;
+            }
+            .display-char {
+                font-size: 4rem;
+            }
+            .display-word {
+                font-size: 1.2rem;
+            }
+            .nav-buttons button, .alphabet-speak-button {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            .input-area {
+                flex-direction: column;
+            }
+            .input-area button {
+                width: 100%;
+            }
+            .image-modal-content {
+                padding: 15px;
+                gap: 10px;
+            }
+            .image-modal-content img {
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Section: Alphabet Learning & Writing Practice -->
+        <div class="learning-section">
+            <h2 class="text-2xl font-bold text-gray-800 text-center mb-4">Pre-K Language Fundamentals</h2>
+
+            <!-- Language Selection Buttons -->
+            <div class="language-buttons flex justify-center gap-2 mb-4 flex-wrap">
+                <button id="lang-english" data-lang-code="en-US" class="active">English</button>
+                <button id="lang-spanish" data-lang-code="es-ES">Español</button>
+                <button id="lang-chinese" data-lang-code="zh-CN">中文</button>
+                <button id="lang-french" data-lang-code="fr-FR">Français</button>
+                <button id="lang-vietnamese" data-lang-code="vi-VN">Tiếng Việt</button>
+                <button id="lang-korean" data-lang-code="ko-KR">한국어</button>
+                <button id="lang-japanese" data-lang-code="ja-JP">日本語</button>
+                <button id="lang-german" data-lang-code="de-DE">Deutsch</button>
+            </div>
+
+            <!-- Alphabet/Character Display -->
+            <div class="alphabet-display">
+                <div id="display-char" class="display-char">A</div>
+                <img id="alphabet-image" class="alphabet-image" src="" alt="Word Image" />
+                <div id="display-word" class="display-word">Apple</div>
+                <button id="alphabet-speak-button" class="alphabet-speak-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10a7.971 7.971 0 00-2.343-5.657zM11.536 7.05a1 1 0 011.414 0 3.972 3.972 0 011.172 2.828 3.972 3.972 0 01-1.172 2.828 1 1 0 01-1.414-1.414A1.972 1.972 0 0012 10a1.972 1.972 0 00-.536-1.464z" clip-rule="evenodd" />
+                    </svg>
+                    Speak
+                </button>
+            </div>
+
+            <!-- Navigation for Alphabet -->
+            <div class="nav-buttons flex justify-center gap-4 mb-4">
+                <button id="prev-char">Previous</button>
+                <button id="next-char">Next</button>
+            </div>
+
+            <!-- Writing Practice Canvas -->
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Practice Writing</h3>
+            <canvas id="drawingCanvas"></canvas>
+            <button id="clear-canvas" class="clear-canvas-button nav-buttons">Clear Canvas</button>
+
+            <!-- K-12 Conceptual Expansion -->
+            <div class="k12-concept">
+                <h3>Beyond Pre-K: K-12 Language Mastery</h3>
+                <p>For older students, the AI adapts to teach:</p>
+                <ul>
+                    <li>**Grammar & Syntax:** Interactive exercises, AI-generated explanations, and real-time corrections.</li>
+                    <li>**Vocabulary Expansion:** Contextual learning, personalized flashcards, and AI-curated reading materials.</li>
+                    <li>**Conversational Fluency:** Advanced AI tutors for role-playing, debate, and spontaneous dialogue.</li>
+                    <li>**Reading Comprehension:** AI-tailored texts, summarization, and critical analysis tools.</li>
+                    <li>**Creative Writing:** AI assistance for essays, stories, and poetry in the target language.</li>
+                    <li>**Cultural Immersion:** Virtual tours, historical context, and etiquette lessons.</li>
+                </ul>
+                <p class="mt-2 text-sm text-gray-600">The AI continuously assesses progress to deliver personalized challenges and content, ensuring every USA student achieves advanced proficiency across multiple languages.</p>
+            </div>
+        </div>
+
+        <!-- Right Section: AI Language Tutor Chat -->
+        <div class="chat-section">
+            <h2 class="text-2xl font-bold text-gray-800 text-center mb-4">AI Language Tutor</h2>
+
+            <!-- Language Selection for Chat -->
+            <div class="language-selector flex justify-center gap-2 mb-4 flex-wrap">
+                <button id="chat-lang-english" data-lang-code="en-US" class="active">English</button>
+                <button id="chat-lang-spanish" data-lang-code="es-ES">Español</button>
+                <button id="chat-lang-french" data-lang-code="fr-FR">Français</button>
+                <button id="chat-lang-german" data-lang-code="de-DE">Deutsch</button>
+                <button id="chat-lang-japanese" data-lang-code="ja-JP">日本語</button>
+                <button id="chat-lang-korean" data-lang-code="ko-KR">한국어</button>
+                <button id="chat-lang-vietnamese" data-lang-code="vi-VN">Tiếng Việt</button>
+            </div>
+
+            <!-- Chat Window -->
+            <div id="chat-window" class="chat-window">
+                <div class="ai-message">
+                    Hello! I'm your AI language tutor. What language would you like to practice today?
+                    <span class="message-speaker" onclick="speakContent('Hello! I\'m your AI language tutor. What language would you like to practice today?', 'en-US')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10a7.971 7.971 0 00-2.343-5.657zM11.536 7.05a1 1 0 011.414 0 3.972 3.972 0 011.172 2.828 3.972 3.972 0 01-1.172 2.828 1 1 0 01-1.414-1.414A1.972 1.972 0 0012 10a1.972 1.972 0 00-.536-1.464z" clip-rule="evenodd" />
+                        </svg>
+                        Speak
+                    </span>
+                </div>
+            </div>
+
+            <!-- Input Area for Chat -->
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Type your message here..." />
+                <button id="send-button">Send</button>
+            </div>
+            <div id="loading-indicator" class="loading-indicator hidden">AI is thinking...</div>
+        </div>
+    </div>
+
+    <!-- Image Display Modal -->
+    <div id="image-modal" class="image-modal">
+        <div class="image-modal-content">
+            <h3 class="text-xl font-bold text-gray-800" id="image-modal-title"></h3>
+            <p class="image-loading-text hidden" id="image-loading-text">Generating image...</p>
+            <img id="generated-image" src="" alt="Generated Image" class="hidden" />
+            <button id="close-image-modal">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to speak text using browser's SpeechSynthesis API (GLOBAL SCOPE)
+        function speakContent(text, langCode) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = langCode;
+                speechSynthesis.speak(utterance);
+            } else {
+                console.warn('Speech synthesis not supported in this browser.');
+            }
+        }
+
+        // --- Language Data for Alphabet Section ---
+        const languagesData = {
+            english: {
+                name: 'English',
+                langCode: 'en-US',
+                letters: [
+                    { char: 'A', word: 'Apple', imageUrl: 'https://placehold.co/150x150/FF0000/FFFFFF?text=Apple' },
+                    { char: 'B', word: 'Ball', imageUrl: 'https://placehold.co/150x150/00FF00/FFFFFF?text=Ball' },
+                    { char: 'C', word: 'Cat', imageUrl: 'https://placehold.co/150x150/0000FF/FFFFFF?text=Cat' },
+                    { char: 'D', word: 'Dog', imageUrl: 'https://placehold.co/150x150/FFFF00/000000?text=Dog' },
+                    { char: 'E', word: 'Elephant', imageUrl: 'https://placehold.co/150x150/FF00FF/FFFFFF?text=Elephant' },
+                    { char: 'F', word: 'Fish', imageUrl: 'https://placehold.co/150x150/00FFFF/000000?text=Fish' },
+                    { char: 'G', word: 'Grape', imageUrl: 'https://placehold.co/150x150/800080/FFFFFF?text=Grape' },
+                    { char: 'H', word: 'Hat', imageUrl: 'https://placehold.co/150x150/FFA500/FFFFFF?text=Hat' },
+                    { char: 'I', word: 'Ice Cream', imageUrl: 'https://placehold.co/150x150/ADD8E6/000000?text=Ice+Cream' },
+                    { char: 'J', word: 'Jellyfish', imageUrl: 'https://placehold.co/150x150/FFC0CB/000000?text=Jellyfish' },
+                    { char: 'K', word: 'Kite', imageUrl: 'https://placehold.co/150x150/808080/FFFFFF?text=Kite' },
+                    { char: 'L', word: 'Lion', imageUrl: 'https://placehold.co/150x150/B8860B/FFFFFF?text=Lion' },
+                    { char: 'M', word: 'Monkey', imageUrl: 'https://placehold.co/150x150/A52A2A/FFFFFF?text=Monkey' },
+                    { char: 'N', word: 'Nest', imageUrl: 'https://placehold.co/150x150/D2B48C/000000?text=Nest' },
+                    { char: 'O', word: 'Orange', imageUrl: 'https://placehold.co/150x150/FF4500/FFFFFF?text=Orange' },
+                    { char: 'P', word: 'Penguin', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Penguin' },
+                    { char: 'Q', word: 'Queen', imageUrl: 'https://placehold.co/150x150/DAA520/FFFFFF?text=Queen' },
+                    { char: 'R', word: 'Rabbit', imageUrl: 'https://placehold.co/150x150/C0C0C0/000000?text=Rabbit' },
+                    { char: 'S', word: 'Sun', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Sun' },
+                    { char: 'T', word: 'Tree', imageUrl: 'https://placehold.co/150x150/228B22/FFFFFF?text=Tree' },
+                    { char: 'U', word: 'Umbrella', imageUrl: 'https://placehold.co/150x150/9370DB/FFFFFF?text=Umbrella' },
+                    { char: 'V', word: 'Violin', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Violin' },
+                    { char: 'W', word: 'Watch', imageUrl: 'https://placehold.co/150x150/483D8B/FFFFFF?text=Watch' },
+                    { char: 'X', word: 'Xylophone', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Xylophone' },
+                    { char: 'Y', word: 'Yacht', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Yacht' },
+                    { char: 'Z', word: 'Zebra', imageUrl: 'https://placehold.co/150x150/000000/FFFFFF?text=Zebra' }
+                ]
+            },
+            spanish: {
+                name: 'Español',
+                langCode: 'es-ES',
+                letters: [
+                    { char: 'A', word: 'Avión', imageUrl: 'https://placehold.co/150x150/87CEEB/000000?text=Avion' },
+                    { char: 'B', word: 'Barco', imageUrl: 'https://placehold.co/150x150/B0C4DE/000000?text=Barco' },
+                    { char: 'C', word: 'Casa', imageUrl: 'https://placehold.co/150x150/F08080/FFFFFF?text=Casa' },
+                    { char: 'D', word: 'Delfín', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Delfin' },
+                    { char: 'E', word: 'Estrella', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Estrella' },
+                    { char: 'F', word: 'Flor', imageUrl: 'https://placehold.co/150x150/FF69B4/FFFFFF?text=Flor' },
+                    { char: 'G', 'word': 'Gato', imageUrl: 'https://placehold.co/150x150/708090/FFFFFF?text=Gato' },
+                    { char: 'H', word: 'Helado', imageUrl: 'https://placehold.co/150x150/F5DEB3/000000?text=Helado' },
+                    { char: 'I', word: 'Iglesia', imageUrl: 'https://placehold.co/150x150/BDB76B/FFFFFF?text=Iglesia' },
+                    { char: 'J', word: 'Jirafa', imageUrl: 'https://placehold.co/150x150/DAA520/FFFFFF?text=Jirafa' },
+                    { char: 'K', word: 'Koala', imageUrl: 'https://placehold.co/150x150/A9A9A9/FFFFFF?text=Koala' },
+                    { char: 'L', word: 'León', imageUrl: 'https://placehold.co/150x150/FF8C00/FFFFFF?text=Leon' },
+                    { char: 'M', word: 'Mono', imageUrl: 'https://placehold.co/150x150/CD853F/FFFFFF?text=Mono' },
+                    { char: 'N', word: 'Nube', imageUrl: 'https://placehold.co/150x150/F0F8FF/000000?text=Nube' },
+                    { char: 'Ñ', word: 'Ñu', imageUrl: 'https://placehold.co/150x150/5F9EA0/FFFFFF?text=N%C3%B1u' },
+                    { char: 'O', word: 'Oso', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Oso' },
+                    { char: 'P', word: 'Pato', imageUrl: 'https://placehold.co/150x150/FFDAB9/000000?text=Pato' },
+                    { char: 'Q', word: 'Queso', imageUrl: 'https://placehold.co/150x150/F0E68C/000000?text=Queso' },
+                    { char: 'R', word: 'Ratón', imageUrl: 'https://placehold.co/150x150/D3D3D3/000000?text=Raton' },
+                    { char: 'S', word: 'Sol', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Sol' },
+                    { char: 'T', word: 'Tren', imageUrl: 'https://placehold.co/150x150/A9A9A9/FFFFFF?text=Tren' },
+                    { char: 'U', word: 'Uvas', imageUrl: 'https://placehold.co/150x150/800080/FFFFFF?text=Uvas' },
+                    { char: 'V', word: 'Vaca', imageUrl: 'https://placehold.co/150x150/A0522D/FFFFFF?text=Vaca' },
+                    { char: 'W', word: 'Waffle', imageUrl: 'https://placehold.co/150x150/F5DEB3/000000?text=Waffle' },
+                    { char: 'X', word: 'Xilófono', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Xilofono' },
+                    { char: 'Y', word: 'Yate', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Yate' },
+                    { char: 'Z', word: 'Zorro', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Zorro' }
+                ]
+            },
+            chinese: {
+                name: '中文 (Pinyin)',
+                langCode: 'zh-CN',
+                letters: [
+                    { char: 'A', word: 'Āi (唉 - alas)', imageUrl: 'https://placehold.co/150x150/FF7F50/FFFFFF?text=Ai' },
+                    { char: 'B', word: 'Bà (爸 - dad)', imageUrl: 'https://placehold.co/150x150/8A2BE2/FFFFFF?text=Ba' },
+                    { char: 'C', word: 'Chī (吃 - eat)', imageUrl: 'https://placehold.co/150x150/D2691E/FFFFFF?text=Chi' },
+                    { char: 'D', word: 'Dà (大 - big)', imageUrl: 'https://placehold.co/150x150/6495ED/FFFFFF?text=Da' },
+                    { char: 'E', word: 'È (饿 - hungry)', imageUrl: 'https://placehold.co/150x150/DC143C/FFFFFF?text=E' },
+                    { char: 'F', word: 'Fēi (飞 - fly)', imageUrl: 'https://placehold.co/150x150/20B2AA/FFFFFF?text=Fei' },
+                    { char: 'G', word: 'Gē (哥 - elder brother)', imageUrl: 'https://placehold.co/150x150/BDB76B/FFFFFF?text=Ge' },
+                    { char: 'H', word: 'Hǎo (好 - good)', imageUrl: 'https://placehold.co/150x150/3CB371/FFFFFF?text=Hao' },
+                    { char: 'I', word: 'Yī (衣 - clothes)', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Yi' },
+                    { char: 'J', word: 'Jiā (家 - home)', imageUrl: 'https://placehold.co/150x150/FF6347/FFFFFF?text=Jia' },
+                    { char: 'K', word: 'Kāi (开 - open)', imageUrl: 'https://placehold.co/150x150/40E0D0/000000?text=Kai' },
+                    { char: 'L', word: 'Lái (来 - come)', imageUrl: 'https://placehold.co/150x150/DA70D6/FFFFFF?text=Lai' },
+                    { char: 'M', word: 'Mā (妈 - mom)', imageUrl: 'https://placehold.co/150x150/FF1493/FFFFFF?text=Ma' },
+                    { char: 'N', word: 'Nǐ (你 - you)', imageUrl: 'https://placehold.co/150x150/1E90FF/FFFFFF?text=Ni' },
+                    { char: 'O', word: 'Wǒ (我 - I/me)', imageUrl: 'https://placehold.co/150x150/FF8C00/FFFFFF?text=Wo' },
+                    { char: 'P', word: 'Píng (平 - flat)', imageUrl: 'https://placehold.co/150x150/7B68EE/FFFFFF?text=Ping' },
+                    { char: 'Q', word: 'Qù (去 - go)', imageUrl: 'https://placehold.co/150x150/ADFF2F/000000?text=Qu' },
+                    { char: 'R', word: 'Rén (人 - person)', imageUrl: 'https://placehold.co/150x150/F4A460/FFFFFF?text=Ren' },
+                    { char: 'S', word: 'Shuǐ (水 - water)', imageUrl: 'https://placehold.co/150x150/4169E1/FFFFFF?text=Shui' },
+                    { char: 'T', word: 'Tā (他 - he)', imageUrl: 'https://placehold.co/150x150/CD5C5C/FFFFFF?text=Ta' },
+                    { char: 'U', word: 'Wǔ (五 - five)', imageUrl: 'https://placehold.co/150x150/BA55D3/FFFFFF?text=Wu' },
+                    { char: 'V', word: 'Lǜ (绿 - green)', imageUrl: 'https://placehold.co/150x150/228B22/FFFFFF?text=Lv' },
+                    { char: 'W', word: 'Wǒ (我 - I/me)', imageUrl: 'https://placehold.co/15old.co/150x150/FFD700/000000?text=Wo' },
+                    { char: 'X', word: 'Xiǎo (小 - small)', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Xiao' },
+                    { char: 'Y', word: 'Yú (鱼 - fish)', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Yu' },
+                    { char: 'Z', word: 'Zài (在 - at)', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Zai' }
+                ]
+            },
+            french: {
+                name: 'Français',
+                langCode: 'fr-FR',
+                letters: [
+                    { char: 'A', word: 'Avion', imageUrl: 'https://placehold.co/150x150/87CEEB/000000?text=Avion' },
+                    { char: 'B', word: 'Bateau', imageUrl: 'https://placehold.co/150x150/B0C4DE/000000?text=Bateau' },
+                    { char: 'C', word: 'Chat', imageUrl: 'https://placehold.co/150x150/708090/FFFFFF?text=Chat' },
+                    { char: 'D', word: 'Dauphin', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Dauphin' },
+                    { char: 'E', word: 'Éléphant', imageUrl: 'https://placehold.co/150x150/A9A9A9/FFFFFF?text=Elephant' },
+                    { char: 'F', word: 'Fleur', imageUrl: 'https://placehold.co/150x150/FF69B4/FFFFFF?text=Fleur' },
+                    { char: 'G', word: 'Gâteau', imageUrl: 'https://placehold.co/150x150/FFC0CB/000000?text=Gateau' },
+                    { char: 'H', word: 'Hélicoptère', imageUrl: 'https://placehold.co/150x150/BDB76B/FFFFFF?text=Helicoptere' },
+                    { char: 'I', word: 'Île', imageUrl: 'https://placehold.co/150x150/20B2AA/FFFFFF?text=Ile' },
+                    { char: 'J', word: 'Jardin', imageUrl: 'https://placehold.co/150x150/3CB371/FFFFFF?text=Jardin' },
+                    { char: 'K', word: 'Kangourou', imageUrl: 'https://placehold.co/150x150/CD853F/FFFFFF?text=Kangourou' },
+                    { char: 'L', word: 'Livre', imageUrl: 'https://placehold.co/150x150/F4A460/FFFFFF?text=Livre' },
+                    { char: 'M', word: 'Maison', imageUrl: 'https://placehold.co/150x150/F08080/FFFFFF?text=Maison' },
+                    { char: 'N', word: 'Nuage', imageUrl: 'https://placehold.co/150x150/F0F8FF/000000?text=Nuage' },
+                    { char: 'O', word: 'Oiseau', imageUrl: 'https://placehold.co/150x150/87CEEB/000000?text=Oiseau' },
+                    { char: 'P', word: 'Poisson', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Poisson' },
+                    { char: 'Q', word: 'Quatre', imageUrl: 'https://placehold.co/150x150/ADFF2F/000000?text=Quatre' },
+                    { char: 'R', word: 'Rose', imageUrl: 'https://placehold.co/150x150/FF1493/FFFFFF?text=Rose' },
+                    { char: 'S', word: 'Soleil', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Soleil' },
+                    { char: 'T', word: 'Table', imageUrl: 'https://placehold.co/150x150/A9A9A9/FFFFFF?text=Table' },
+                    { char: 'U', word: 'Usine', imageUrl: 'https://placehold.co/150x150/BA55D3/FFFFFF?text=Usine' },
+                    { char: 'V', word: 'Voiture', imageUrl: 'https://placehold.co/150x150/CD5C5C/FFFFFF?text=Voiture' },
+                    { char: 'W', word: 'Wagon', imageUrl: 'https://placehold.co/150x150/D2B48C/000000?text=Wagon' },
+                    { char: 'X', word: 'Xylophone', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Xylophone' },
+                    { char: 'Y', word: 'Yeux', imageUrl: 'https://placehold.co/150x150/1E90FF/FFFFFF?text=Yeux' },
+                    { char: 'Z', word: 'Zèbre', imageUrl: 'https://placehold.co/150x150/000000/FFFFFF?text=Zebre' },
+                    { char: 'Ç', word: 'Garçon', imageUrl: 'https://placehold.co/150x150/BDB76B/FFFFFF?text=Garcon' },
+                    { char: 'É', word: 'École', imageUrl: 'https://placehold.co/150x150/6495ED/FFFFFF?text=Ecole' },
+                    { char: 'À', word: 'À (to/at)', imageUrl: 'https://placehold.co/150x150/FF7F50/FFFFFF?text=A' }
+                ]
+            },
+            vietnamese: {
+                name: 'Tiếng Việt',
+                langCode: 'vi-VN',
+                letters: [
+                    { char: 'A', word: 'Ăn (eat)', imageUrl: 'https://placehold.co/150x150/FF0000/FFFFFF?text=An' },
+                    { char: 'Ă', word: 'Căn (root)', imageUrl: 'https://placehold.co/150x150/00FF00/FFFFFF?text=Can' },
+                    { char: 'Â', word: 'Vâng (yes)', imageUrl: 'https://placehold.co/150x150/0000FF/FFFFFF?text=Vang' },
+                    { char: 'B', word: 'Bò (cow)', imageUrl: 'https://placehold.co/150x150/FFFF00/000000?text=Bo' },
+                    { char: 'C', word: 'Cá (fish)', imageUrl: 'https://placehold.co/150x150/FF00FF/FFFFFF?text=Ca' },
+                    { char: 'D', word: 'Da (skin)', imageUrl: 'https://placehold.co/150x150/00FFFF/000000?text=Da' },
+                    { char: 'Đ', word: 'Đi (go)', imageUrl: 'https://placehold.co/150x150/800080/FFFFFF?text=Di' },
+                    { char: 'E', word: 'Em (younger sibling)', imageUrl: 'https://placehold.co/150x150/FFA500/FFFFFF?text=Em' },
+                    { char: 'Ê', word: 'Kẹo (candy)', imageUrl: 'https://placehold.co/150x150/ADD8E6/000000?text=Keo' },
+                    { char: 'G', word: 'Gà (chicken)', imageUrl: 'https://placehold.co/150x150/FFC0CB/000000?text=Ga' },
+                    { char: 'H', word: 'Học (study)', imageUrl: 'https://placehold.co/150x150/808080/FFFFFF?text=Hoc' },
+                    { char: 'I', word: 'In (print)', imageUrl: 'https://placehold.co/150x150/B8860B/FFFFFF?text=In' },
+                    { char: 'K', word: 'Kéo (scissors)', imageUrl: 'https://placehold.co/150x150/A52A2A/FFFFFF?text=Keo' },
+                    { char: 'L', word: 'Lá (leaf)', imageUrl: 'https://placehold.co/150x150/D2B48C/000000?text=La' },
+                    { char: 'M', word: 'Mẹ (mother)', imageUrl: 'https://placehold.co/150x150/FF4500/FFFFFF?text=Me' },
+                    { char: 'N', word: 'Nước (water)', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Nuoc' },
+                    { char: 'O', word: 'Con (child)', imageUrl: 'https://placehold.co/150x150/DAA520/FFFFFF?text=Con' },
+                    { char: 'Ô', word: 'Côn (insect)', imageUrl: 'https://placehold.co/150x150/C0C0C0/000000?text=Con' },
+                    { char: 'Ơ', word: 'Mơ (dream)', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Mo' },
+                    { char: 'P', word: 'Phở (pho)', imageUrl: 'https://placehold.co/150x150/228B22/FFFFFF?text=Pho' },
+                    { char: 'Q', word: 'Quả (fruit)', imageUrl: 'https://placehold.co/150x150/9370DB/FFFFFF?text=Qua' },
+                    { char: 'R', word: 'Rau (vegetable)', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Rau' },
+                    { char: 'S', word: 'Sách (book)', imageUrl: 'https://placehold.co/150x150/483D8B/FFFFFF?text=Sach' },
+                    { char: 'T', word: 'Tay (hand)', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Tay' },
+                    { char: 'U', word: 'Túi (bag)', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Tui' },
+                    { char: 'Ư', word: 'Tươi (fresh)', imageUrl: 'https://placehold.co/150x150/000000/FFFFFF?text=Tuoi' },
+                    { char: 'V', word: 'Vui (happy)', imageUrl: 'https://placehold.co/150x150/FF0000/FFFFFF?text=Vui' },
+                    { char: 'X', word: 'Xe (vehicle)', imageUrl: 'https://placehold.co/150x150/00FF00/FFFFFF?text=Xe' },
+                    { char: 'Y', word: 'Yêu (love)', imageUrl: 'https://placehold.co/150x150/0000FF/FFFFFF?text=Yeu' }
+                ]
+            },
+            korean: {
+                name: '한국어',
+                langCode: 'ko-KR',
+                letters: [
+                    { char: 'ㄱ', word: '가 (Ga - go)', imageUrl: 'https://placehold.co/150x150/FF0000/FFFFFF?text=Ga' },
+                    { char: 'ㄴ', word: '나 (Na - I/me - informal)', imageUrl: 'https://placehold.co/150x150/00FF00/FFFFFF?text=Na' },
+                    { char: 'ㄷ', word: '다 (Da - all)', imageUrl: 'https://placehold.co/150x150/0000FF/FFFFFF?text=Da' },
+                    { char: 'ㄹ', word: '라 (Ra - a particle)', imageUrl: 'https://placehold.co/150x150/FFFF00/000000?text=Ra' },
+                    { char: 'ㅁ', word: '마 (Ma - horse)', imageUrl: 'https://placehold.co/150x150/FF00FF/FFFFFF?text=Ma' },
+                    { char: 'ㅂ', word: '바 (Ba - bar)', imageUrl: 'https://placehold.co/150x150/00FFFF/000000?text=Ba' },
+                    { char: 'ㅅ', word: '사 (Sa - four)', imageUrl: 'https://placehold.co/150x150/800080/FFFFFF?text=Sa' },
+                    { char: 'ㅇ', word: '아 (A-i - child)', imageUrl: 'https://placehold.co/150x150/FFA500/FFFFFF?text=Ai' },
+                    { char: 'ㅈ', word: '자 (Ja - letter)', imageUrl: 'https://placehold.co/150x150/ADD8E6/000000?text=Ja' },
+                    { char: 'ㅊ', word: '차 (Cha - car/tea)', imageUrl: 'https://placehold.co/150x150/FFC0CB/000000?text=Cha' },
+                    { char: 'ㅋ', word: '카 (Ka - card)', imageUrl: 'https://placehold.co/150x150/808080/FFFFFF?text=Ka' },
+                    { char: 'ㅌ', word: '타 (Ta - ride)', imageUrl: 'https://placehold.co/150x150/B8860B/FFFFFF?text=Ta' },
+                    { char: 'ㅍ', word: '파 (Pa - green onion)', imageUrl: 'https://placehold.co/150x150/A52A2A/FFFFFF?text=Pa' },
+                    { char: 'ㅎ', word: '하 (Ha - do)', imageUrl: 'https://placehold.co/150x150/D2B48C/000000?text=Ha' },
+                    { char: 'ㅏ', word: '아이 (A-i - child)', imageUrl: 'https://placehold.co/150x150/FF4500/FFFFFF?text=Ai' },
+                    { char: 'ㅑ', word: '야구 (Ya-gu - baseball)', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Yagu' },
+                    { char: 'ㅓ', word: '어머니 (Eo-meo-ni - mother)', imageUrl: 'https://placehold.co/150x150/DAA520/FFFFFF?text=Eomeoni' },
+                    { char: 'ㅕ', word: '여기 (Yeo-gi - here)', imageUrl: 'https://placehold.co/150x150/C0C0C0/000000?text=Yeogi' },
+                    { char: 'ㅗ', word: '오이 (O-i - cucumber)', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Oi' },
+                    { char: 'ㅛ', word: '요리 (Yo-ri - cooking)', imageUrl: 'https://placehold.co/150x150/228B22/FFFFFF?text=Yori' },
+                    { char: 'ㅜ', word: '우유 (U-yu - milk)', imageUrl: 'https://placehold.co/150x150/9370DB/FFFFFF?text=Uyu' },
+                    { char: 'ㅠ', word: '유리 (Yu-ri - glass)', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Yuri' },
+                    { char: 'ㅡ', word: '으뜸 (Eu-tteum - best)', imageUrl: 'https://placehold.co/150x150/483D8B/FFFFFF?text=Eutteum' },
+                    { char: 'ㅣ', word: '이 (I - two/tooth)', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=I' }
+                ]
+            },
+            japanese: {
+                name: '日本語',
+                langCode: 'ja-JP',
+                letters: [
+                    { char: 'あ', word: 'あい (ai - love)', imageUrl: 'https://placehold.co/150x150/FF0000/FFFFFF?text=Ai' },
+                    { char: 'い', word: 'いぬ (inu - dog)', imageUrl: 'https://placehold.co/150x150/00FF00/FFFFFF?text=Inu' },
+                    { char: 'う', word: 'うみ (umi - sea)', imageUrl: 'https://placehold.co/150x150/0000FF/FFFFFF?text=Umi' },
+                    { char: 'え', word: 'えき (eki - station)', imageUrl: 'https://placehold.co/150x150/FFFF00/000000?text=Eki' },
+                    { char: 'お', word: 'おとこ (otoko - man)', imageUrl: 'https://placehold.co/150x150/FF00FF/FFFFFF?text=Otoko' },
+                    { char: 'か', word: 'かさ (kasa - umbrella)', imageUrl: 'https://placehold.co/150x150/00FFFF/000000?text=Kasa' },
+                    { char: 'き', word: 'き (ki - tree)', imageUrl: 'https://placehold.co/150x150/800080/FFFFFF?text=Ki' },
+                    { char: 'く', word: 'くつ (kutsu - shoes)', imageUrl: 'https://placehold.co/150x150/FFA500/FFFFFF?text=Kutsu' },
+                    { char: 'け', word: 'けむり (kemuri - smoke)', imageUrl: 'https://placehold.co/150x150/ADD8E6/000000?text=Kemuri' },
+                    { char: 'こ', word: 'こども (kodomo - child)', imageUrl: 'https://placehold.co/150x150/FFC0CB/000000?text=Kodomo' },
+                    { char: 'さ', word: 'さかな (sakana - fish)', imageUrl: 'https://placehold.co/150x150/808080/FFFFFF?text=Sakana' },
+                    { char: 'し', word: 'しお (shio - salt)', imageUrl: 'https://placehold.co/150x150/B8860B/FFFFFF?text=Shio' },
+                    { char: 'す', word: 'すし (sushi - sushi)', imageUrl: 'https://placehold.co/150x150/A52A2A/FFFFFF?text=Sushi' },
+                    { char: 'せ', word: 'せかい (sekai - world)', imageUrl: 'https://placehold.co/150x150/D2B48C/000000?text=Sekai' },
+                    { char: 'そ', word: 'そら (sora - sky)', imageUrl: 'https://placehold.co/150x150/FF4500/FFFFFF?text=Sora' },
+                    { char: 'た', word: 'たべます (tabemasu - eat)', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Tabemasu' },
+                    { char: 'ち', word: 'ちず (chizu - map)', imageUrl: 'https://placehold.co/150x150/DAA520/FFFFFF?text=Chizu' },
+                    { char: 'つ', word: 'つき (tsuki - moon)', imageUrl: 'https://placehold.co/150x150/C0C0C0/000000?text=Tsuki' },
+                    { char: 'て', word: 'て (te - hand)', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Te' },
+                    { char: 'と', word: 'とけい (tokei - clock)', imageUrl: 'https://placehold.co/150x150/228B22/FFFFFF?text=Tokei' },
+                    { char: 'な', word: 'なまえ (namae - name)', imageUrl: 'https://placehold.co/150x150/9370DB/FFFFFF?text=Namae' },
+                    { char: 'に', word: 'にほん (nihon - Japan)', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Nihon' },
+                    { char: 'ぬ', word: 'ぬの (nuno - cloth)', imageUrl: 'https://placehold.co/150x150/483D8B/FFFFFF?text=Nuno' },
+                    { char: 'ね', word: 'ねこ (neko - cat)', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Neko' },
+                    { char: 'の', word: 'のり (nori - seaweed)', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Nori' }
+                ]
+            },
+            german: {
+                name: 'Deutsch',
+                langCode: 'de-DE',
+                letters: [
+                    { char: 'A', word: 'Apfel', imageUrl: 'https://placehold.co/150x150/FF0000/FFFFFF?text=Apfel' },
+                    { char: 'B', word: 'Ball', imageUrl: 'https://placehold.co/150x150/00FF00/FFFFFF?text=Ball' },
+                    { char: 'C', word: 'Computer', imageUrl: 'https://placehold.co/150x150/0000FF/FFFFFF?text=Computer' },
+                    { char: 'D', word: 'Dach', imageUrl: 'https://placehold.co/150x150/FFFF00/000000?text=Dach' },
+                    { char: 'E', word: 'Elefant', imageUrl: 'https://placehold.co/150x150/FF00FF/FFFFFF?text=Elefant' },
+                    { char: 'F', word: 'Fisch', imageUrl: 'https://placehold.co/150x150/00FFFF/000000?text=Fisch' },
+                    { char: 'G', word: 'Garten', imageUrl: 'https://placehold.co/150x150/800080/FFFFFF?text=Garten' },
+                    { char: 'H', word: 'Haus', imageUrl: 'https://placehold.co/150x150/FFA500/FFFFFF?text=Haus' },
+                    { char: 'I', word: 'Igel', imageUrl: 'https://placehold.co/150x150/ADD8E6/000000?text=Igel' },
+                    { char: 'J', word: 'Jacke', imageUrl: 'https://placehold.co/150x150/FFC0CB/000000?text=Jacke' },
+                    { char: 'K', word: 'Katze', imageUrl: 'https://placehold.co/150x150/808080/FFFFFF?text=Katze' },
+                    { char: 'L', word: 'Löwe', imageUrl: 'https://placehold.co/150x150/B8860B/FFFFFF?text=Loewe' },
+                    { char: 'M', word: 'Maus', imageUrl: 'https://placehold.co/150x150/A52A2A/FFFFFF?text=Maus' },
+                    { char: 'N', word: 'Nacht', imageUrl: 'https://placehold.co/150x150/D2B48C/000000?text=Nacht' },
+                    { char: 'O', word: 'Orange', imageUrl: 'https://placehold.co/150x150/FF4500/FFFFFF?text=Orange' },
+                    { char: 'P', word: 'Pferd', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Pferd' },
+                    { char: 'Q', word: 'Quelle', imageUrl: 'https://placehold.co/150x150/DAA520/FFFFFF?text=Quelle' },
+                    { char: 'R', word: 'Regen', imageUrl: 'https://placehold.co/150x150/C0C0C0/000000?text=Regen' },
+                    { char: 'S', word: 'Sonne', imageUrl: 'https://placehold.co/150x150/FFD700/000000?text=Sonne' },
+                    { char: 'T', word: 'Tisch', imageUrl: 'https://placehold.co/150x150/228B22/FFFFFF?text=Tisch' },
+                    { char: 'U', word: 'Uhr', imageUrl: 'https://placehold.co/150x150/9370DB/FFFFFF?text=Uhr' },
+                    { char: 'V', word: 'Vogel', imageUrl: 'https://placehold.co/150x150/8B4513/FFFFFF?text=Vogel' },
+                    { char: 'W', word: 'Wasser', imageUrl: 'https://placehold.co/150x150/483D8B/FFFFFF?text=Wasser' },
+                    { char: 'X', word: 'Xylophone', imageUrl: 'https://placehold.co/150x150/6A5ACD/FFFFFF?text=Xylophone' },
+                    { char: 'Y', word: 'Yacht', imageUrl: 'https://placehold.co/150x150/4682B4/FFFFFF?text=Yacht' },
+                    { char: 'Z', word: 'Zebra', imageUrl: 'https://placehold.co/150x150/000000/FFFFFF?text=Zebra' },
+                    { char: 'Ä', word: 'Äpfel', imageUrl: 'https://placehold.co/150x150/FF0000/FFFFFF?text=Aepfel' },
+                    { char: 'Ö', word: 'Öl', imageUrl: 'https://placehold.co/150x150/808000/FFFFFF?text=Oel' },
+                    { char: 'Ü', word: 'Über', imageUrl: 'https://placehold.co/150x150/4B0082/FFFFFF?text=Ueber' },
+                    { char: 'ẞ', word: 'Straße', imageUrl: 'https://placehold.co/150x150/708090/FFFFFF?text=Strasse' }
+                ]
+            }
+        };
+
+        let currentAlphabetLanguage = 'english';
+        let currentAlphabetLetterIndex = 0;
+
+        // DOM elements for Alphabet Section
+        const displayCharEl = document.getElementById('display-char');
+        const displayWordEl = document.getElementById('display-word');
+        const alphabetImageEl = document.getElementById('alphabet-image'); // New image element
+        const alphabetSpeakButton = document.getElementById('alphabet-speak-button');
+        const prevCharButton = document.getElementById('prev-char');
+        const nextCharButton = document.getElementById('next-char');
+        const alphabetLangButtons = document.querySelectorAll('.language-buttons button');
+
+        // Canvas elements
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const clearCanvasButton = document.getElementById('clear-canvas');
+        let isDrawing = false;
+
+        // Initialize canvas drawing
+        function initCanvas() {
+            const containerWidth = canvas.parentElement.clientWidth;
+            canvas.width = Math.min(450, containerWidth - 40);
+            canvas.height = 150;
+
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#334155';
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startDrawing(e.touches[0]);
+            });
+            canvas.addEventListener('touchend', stopDrawing);
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                draw(e.touches[0]);
+            });
+
+            clearCanvas();
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            const rect = canvas.getBoundingClientRect();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.closePath();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Display current letter, word, and image for alphabet section
+        function displayCurrentAlphabetContent() {
+            const currentLangData = languagesData[currentAlphabetLanguage];
+            const currentContent = currentLangData.letters[currentAlphabetLetterIndex];
+
+            displayCharEl.textContent = currentContent.char;
+            displayWordEl.textContent = currentContent.word;
+            alphabetImageEl.src = currentContent.imageUrl; // Set the image source
+            alphabetImageEl.alt = currentContent.word; // Set alt text for accessibility
+            clearCanvas();
+        }
+
+        // Event Listeners for Alphabet Section
+        alphabetSpeakButton.addEventListener('click', () => {
+            const currentLangData = languagesData[currentAlphabetLanguage];
+            const currentContent = currentLangData.letters[currentAlphabetLetterIndex];
+            speakContent(currentContent.char, currentLangData.langCode);
+            setTimeout(() => {
+                speakContent(currentContent.word, currentLangData.langCode);
+            }, 1000);
+        });
+
+        prevCharButton.addEventListener('click', () => {
+            const currentLangData = languagesData[currentAlphabetLanguage];
+            currentAlphabetLetterIndex = (currentAlphabetLetterIndex - 1 + currentLangData.letters.length) % currentLangData.letters.length;
+            displayCurrentAlphabetContent();
+        });
+
+        nextCharButton.addEventListener('click', () => {
+            const currentLangData = languagesData[currentAlphabetLanguage];
+            currentAlphabetLetterIndex = (currentAlphabetLetterIndex + 1) % currentLangData.letters.length;
+            displayCurrentAlphabetContent();
+        });
+
+        alphabetLangButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                alphabetLangButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentAlphabetLanguage = button.id.replace('lang-', '');
+                currentAlphabetLetterIndex = 0;
+                displayCurrentAlphabetContent();
+            });
+        });
+
+        clearCanvasButton.addEventListener('click', clearCanvas);
+
+
+        // --- Chat Tutor Logic ---
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatLangButtons = document.querySelectorAll('.language-selector button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        let currentChatLangCode = 'en-US';
+        let chatHistory = [{ role: "user", parts: [{ text: "Hello! I'm your AI language tutor. What language would you like to practice today?" }] }];
+
+        function addChatMessage(text, sender, langCode) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            // Create a span for the text and a button for speaking
+            const textSpan = document.createElement('span');
+            textSpan.textContent = text;
+            messageDiv.appendChild(textSpan);
+
+            const speakIcon = document.createElement('span');
+            speakIcon.classList.add('message-speaker');
+            speakIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10a7.971 7.971 0 00-2.343-5.657zM11.536 7.05a1 1 0 011.414 0 3.972 3.972 0 011.172 2.828 3.972 3.972 0 01-1.172 2.828 1 1 0 01-1.414-1.414A1.972 1.972 0 0012 10a1.972 1.972 0 00-.536-1.464z" clip-rule="evenodd" />
+                            </svg>
+                            Speak`;
+            speakIcon.addEventListener('click', () => speakContent(text, langCode));
+            messageDiv.appendChild(speakIcon);
+
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // --- Image Generation Logic ---
+        const imageModal = document.getElementById('image-modal');
+        const generatedImage = document.getElementById('generated-image');
+        const imageLoadingText = document.getElementById('image-loading-text');
+        const imageModalTitle = document.getElementById('image-modal-title');
+        const closeImageModalButton = document.getElementById('close-image-modal');
+
+        closeImageModalButton.addEventListener('click', () => {
+            imageModal.classList.remove('show');
+            generatedImage.src = ''; // Clear image
+            generatedImage.classList.add('hidden');
+            imageLoadingText.classList.add('hidden');
+        });
+
+        async function generateAndDisplayImage(promptText) {
+            imageModal.classList.add('show');
+            imageModalTitle.textContent = `Generating image for "${promptText}"...`;
+            imageLoadingText.classList.remove('hidden');
+            generatedImage.classList.add('hidden'); // Hide previous image
+
+            try {
+                const imagePrompt = `A vibrant, stylized 3D illustration of "${promptText}" on a globe, with diverse children from different cultures looking at it, in a playful, educational style. Focus on bright colors and a friendly, engaging composition.`;
+                const payload = { instances: { prompt: imagePrompt }, parameters: { "sampleCount": 1 } };
+                const apiKey = ""; // Canvas will provide this in runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    generatedImage.src = imageUrl;
+                    generatedImage.classList.remove('hidden');
+                    imageModalTitle.textContent = `Here's your image for "${promptText}"!`;
+                } else {
+                    imageModalTitle.textContent = "Could not generate image.";
+                    console.error("Image generation failed: No image data received.");
+                }
+            } catch (error) {
+                imageModalTitle.textContent = "Error generating image.";
+                console.error('Error fetching image generation:', error);
+            } finally {
+                imageLoadingText.classList.add('hidden');
+            }
+        }
+
+        async function sendChatMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            addChatMessage(message, 'user', 'en-US');
+            userInput.value = '';
+            loadingIndicator.classList.remove('hidden');
+
+            chatHistory.push({ role: "user", parts: [{ text: message }] });
+
+            // Check if the message is a single word or short phrase for image generation
+            const words = message.split(' ').filter(word => word.length > 0);
+            if (words.length > 0 && words.length <= 3 && words[0].toLowerCase() !== 'how' && words[0].toLowerCase() !== 'what' && words[0].toLowerCase() !== 'can' && words[0].toLowerCase() !== 'tell') {
+                // If it looks like a simple noun/phrase, try to generate an image
+                generateAndDisplayImage(message);
+            }
+
+            try {
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "text/plain",
+                    }
+                };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const aiResponseText = result.candidates[0].content.parts[0].text;
+                    addChatMessage(aiResponseText, 'ai', currentChatLangCode);
+                    chatHistory.push({ role: "model", parts: [{ text: aiResponseText }] });
+                } else {
+                    addChatMessage("I'm sorry, I couldn't generate a response. Please try again.", 'ai', 'en-US');
+                }
+            } catch (error) {
+                console.error('Error fetching AI response:', error);
+                addChatMessage("There was an error connecting to the AI. Please check your internet connection and try again.", 'ai', 'en-US');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        sendButton.addEventListener('click', sendChatMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+
+        chatLangButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                chatLangButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentChatLangCode = button.dataset.langCode;
+                chatHistory = [{ role: "user", parts: [{ text: `Let's practice ${button.textContent}. What would you like to learn or practice today?` }] }];
+                chatWindow.innerHTML = `<div class="ai-message">
+                    Hello! I'm your AI language tutor. Let's practice ${button.textContent}. What would you like to learn or practice today?
+                    <span class="message-speaker" onclick="speakContent('Hello! I\'m your AI language tutor. Let\'s practice ${button.textContent}. What would you like to learn or practice today?', '${currentChatLangCode}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10a7.971 7.971 0 00-2.343-5.657zM11.536 7.05a1 1 0 011.414 0 3.972 3.972 0 011.172 2.828 3.972 3.972 0 01-1.172 2.828 1 1 0 01-1.414-1.414A1.972 1.972 0 0012 10a1.972 1.972 0 00-.536-1.464z" clip-rule="evenodd" />
+                        </svg>
+                        Speak
+                    </span>
+                </div>`;
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            });
+        });
+
+        // Initial setup on window load
+        window.onload = () => {
+            initCanvas();
+            displayCurrentAlphabetContent();
+            window.addEventListener('resize', initCanvas);
+        };
+    </script>
+</body>
+</html>
